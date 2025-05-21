@@ -24,7 +24,7 @@ function initTask(subTask) {
             successRate: rate,
             message: message
          };
-      },
+      }
    };
 
    subTask.data = {
@@ -32,35 +32,45 @@ function initTask(subTask) {
    };
    initBlocklySubTask(subTask, {
       player: {
-        mode: 'player',
-        stepDelayMin: 250,
-        stepDelayMax: 1500
+         mode: 'player',
+         stepDelayMin: 250,
+         stepDelayMax: 1500
       },
       afterLoad: function () {
          context.resetDisplay();
-        subTask.context.loadJsonData && subTask.context.loadJsonData();
-        console.log("json loaded after load", subTask.context.unixfilters && subTask.context.unixfilters.stepData);
+         subTask.context.loadJsonData && subTask.context.loadJsonData();
+
       }
-    });
-  
-    subTask.step = function() {
+   });
+
+   subTask.step = function () {
       UnixFilters.nextStep();
-    };
-  
-    subTask.backToFirst = function() {
+   };
+
+   subTask.backToFirst = function() {
+      UnixFilters.showStep(0);
       UnixFilters.stepIndex = 0;
-      $('#etape').text(0);
-      $('#output').text('');
-    };
-  
-    subTask.play = function() {
+   };
+   
+   subTask.goToEnd = function () {
+      subTask.setStepDelay(0);
+      subTask.play();
+   };   
+
+   subTask.play = function () {
+      const delay = UnixFilters.stepDelay != null ? UnixFilters.stepDelay : 400;
+   
       const playNext = () => {
-        if (UnixFilters.stepIndex < UnixFilters.stepData.length) {
-          UnixFilters.nextStep();
-          setTimeout(playNext, 300); 
-        }
+         if (UnixFilters.stepIndex < UnixFilters.stepData.length) {
+            UnixFilters.nextStep();
+            setTimeout(playNext, delay);
+         }
       };
       playNext();
-    };
-  }
-  initWrapper(initTask, ["easy"], null);
+   };   
+
+   subTask.setStepDelay = function (delay) {
+      UnixFilters.stepDelay = delay;
+   };   
+}
+initWrapper(initTask, ["easy"], null);

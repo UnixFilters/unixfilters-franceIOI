@@ -122,47 +122,43 @@ UnixFilters.parseJson = function (jsonData) {
 }
 
 UnixFilters.nextStep = function () {
-    console.log("next step called")
+    console.log("next step called with index",UnixFilters.stepIndex)
     if (!UnixFilters.stepData || UnixFilters.stepIndex >= UnixFilters.stepData.length) {
         console.log("flop")
         return;
     }
-    console.log("ok")
-    const step = UnixFilters.stepData[UnixFilters.stepIndex];
+    UnixFilters.showStep(UnixFilters.stepIndex);
     UnixFilters.stepIndex++;
-    console.log("should show",UnixFilters.stepIndex)
-    $('#etape').text(UnixFilters.stepIndex);
+};
 
+UnixFilters.showStep = function (index) {
+    console.log("show step called with index:",index)
+    if (!UnixFilters.stepData || index >= UnixFilters.stepData.length || index < 0) {
+        console.log("flop dans show step");
+        return;
+    }
+
+    const step = UnixFilters.stepData[index];
+    $('#etape').text(index + 1);
     if (step.stderr === 0) {
         $('#output').text(step.output);
     } else {
-        $('#output').text("error: "+step.output);
+        $('#output').text('error:'+step.output);
     }
 };
 
-// UnixFilters.previousStep = function () {
-//     console.log("STEP INDEX PREVIOUS STEP BEGINNING", UnixFilters.stepIndex);
+UnixFilters.showStep = function (index) {
+    console.log("show step called with index:", index);
+    if (!UnixFilters.stepData || index >= UnixFilters.stepData.length || index < 0) {
+        console.log("flop dans show step");
+        return;
+    }
 
-//     if (!UnixFilters.stepData || UnixFilters.stepIndex <=0) {
-//         return;
-//     }
-//     UnixFilters.stepIndex--;
-
-//     const step = UnixFilters.stepData[UnixFilters.stepIndex];
-
-//     $('#etape').text(UnixFilters.stepIndex);
-
-//     // console.log("UnixFilters.stepIndex", UnixFilters.stepIndex);
-
-//     // console.log("should show step ",previousStep)
-//     // console.log("stderr ",previousStep.stderr)
-//     console.log("STEP INDEX PREVIOUS STEP AFTER", UnixFilters.stepIndex);
-
-//     if (step.stderr === 0) {
-//         console.log("should show output", step.output);
-//         $('#output').text(step.output);
-//     } else {
-//         console.log("should show error");
-//         $('#output').text("error: "+step.output);
-//     }
-// };
+    const step = UnixFilters.stepData[index];
+    $('#etape').text(index + 1);
+    if (step.stderr === 0) {
+        $('#output').text(step.output);
+    } else {
+        $('#output').text('error:' + step.output);
+    }
+};
