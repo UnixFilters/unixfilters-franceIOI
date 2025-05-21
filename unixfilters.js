@@ -111,3 +111,58 @@ UnixFilters.functions.pipe = function(callback) {
     }
     UnixFilters.pipedOutput = true;
 };
+
+UnixFilters.parseJson = function (jsonData) {
+    UnixFilters.stepData = Object.values(jsonData.steps);
+    UnixFilters.stepIndex = 0;
+    
+    Object.values(jsonData.steps).forEach((step) => {
+        console.log("parse json called"); 
+    });
+}
+
+UnixFilters.nextStep = function () {
+    console.log("next step called")
+    if (!UnixFilters.stepData || UnixFilters.stepIndex >= UnixFilters.stepData.length) {
+        console.log("flop")
+        return;
+    }
+    console.log("ok")
+    const step = UnixFilters.stepData[UnixFilters.stepIndex];
+    UnixFilters.stepIndex++;
+    console.log("should show",UnixFilters.stepIndex)
+    $('#etape').text(UnixFilters.stepIndex);
+
+    if (step.stderr === 0) {
+        $('#output').text(step.output);
+    } else {
+        $('#output').text("error: "+step.output);
+    }
+};
+
+// UnixFilters.previousStep = function () {
+//     console.log("STEP INDEX PREVIOUS STEP BEGINNING", UnixFilters.stepIndex);
+
+//     if (!UnixFilters.stepData || UnixFilters.stepIndex <=0) {
+//         return;
+//     }
+//     UnixFilters.stepIndex--;
+
+//     const step = UnixFilters.stepData[UnixFilters.stepIndex];
+
+//     $('#etape').text(UnixFilters.stepIndex);
+
+//     // console.log("UnixFilters.stepIndex", UnixFilters.stepIndex);
+
+//     // console.log("should show step ",previousStep)
+//     // console.log("stderr ",previousStep.stderr)
+//     console.log("STEP INDEX PREVIOUS STEP AFTER", UnixFilters.stepIndex);
+
+//     if (step.stderr === 0) {
+//         console.log("should show output", step.output);
+//         $('#output').text(step.output);
+//     } else {
+//         console.log("should show error");
+//         $('#output').text("error: "+step.output);
+//     }
+// };

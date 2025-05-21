@@ -1,0 +1,25 @@
+{
+  "steps": [
+    {
+      "number": 1,
+      "command_name": "cat",
+      "return": 1,
+      "stderr": 0,
+      "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
+    },
+    {
+      "number": 2,
+      "command_name": "pipe",
+      "return": 1,
+      "stderr": 0,
+      "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
+    },
+    {
+      "number": 3,
+      "command_name": "grep",
+      "return": 1,
+      "stderr": 0,
+      "output": "pêche\npomme\npoire"
+    }
+  ]
+}

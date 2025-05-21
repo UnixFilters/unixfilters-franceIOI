@@ -63,6 +63,14 @@ var getContext = function(display, infos, curLevel) {
       context.updateScale();
    };
 
+   context.loadJsonData = function () {
+      const jsonText = document.getElementById('test-json').textContent;
+      const data = JSON.parse(jsonText);
+      UnixFilters.parseJson(data);
+      console.log("json loaded", data);
+    };
+    context.loadJsonData();
+    
    context.onChange = function() {
       UnixFilters.onChange(context);
    }

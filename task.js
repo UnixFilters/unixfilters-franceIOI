@@ -15,7 +15,7 @@ function initTask(subTask) {
       checkEndCondition: function(context, lastTurn) {
          if (!lastTurn) return;
 
-         context.success = true;
+         context.success = false;
          throw(window.languageStrings.messages.outputCorrect);
       },
       computeGrade: function(context, message) {
@@ -24,14 +24,43 @@ function initTask(subTask) {
             successRate: rate,
             message: message
          };
-      }
+      },
    };
 
    subTask.data = {
       easy: [''],
    };
-
-   initBlocklySubTask(subTask);
-}
-
-initWrapper(initTask, ["easy"], null);
+   initBlocklySubTask(subTask, {
+      player: {
+        mode: 'player',
+        stepDelayMin: 250,
+        stepDelayMax: 1500
+      },
+      afterLoad: function () {
+         context.resetDisplay();
+        subTask.context.loadJsonData && subTask.context.loadJsonData();
+        console.log("json loaded after load", subTask.context.unixfilters && subTask.context.unixfilters.stepData);
+      }
+    });
+  
+    subTask.step = function() {
+      UnixFilters.nextStep();
+    };
+  
+    subTask.backToFirst = function() {
+      UnixFilters.stepIndex = 0;
+      $('#etape').text(0);
+      $('#output').text('');
+    };
+  
+    subTask.play = function() {
+      const playNext = () => {
+        if (UnixFilters.stepIndex < UnixFilters.stepData.length) {
+          UnixFilters.nextStep();
+          setTimeout(playNext, 300); 
+        }
+      };
+      playNext();
+    };
+  }
+  initWrapper(initTask, ["easy"], null);

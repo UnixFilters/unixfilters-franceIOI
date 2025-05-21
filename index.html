@@ -1,13 +1,15 @@
 <!doctype html>
 <html>
    <head>
-    <meta charset="utf-8">
-    <title>Unix filters</title>
-    <script>
+      <meta charset="utf-8">
+      <title>Unix filters</title>
+      <script>
       window.stringsLanguage = 'fr';
     </script>
-    <script class="remove" type="text/javascript" src="../bebras-modules/pemFioi/importModules-1.5.js" id="import-modules"></script>
-    <script class="remove" type="text/javascript">
+      <script class="remove" type="text/javascript"
+         src="../bebras-modules/pemFioi/importModules-1.5.js"
+         id="import-modules"></script>
+      <script class="remove" type="text/javascript">
       var modulesPath = '../bebras-modules/';
       importModules([
         'jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'beaver-task-2.0', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0',
@@ -17,10 +19,47 @@
       // set Blockly as default language when none is specified through ?language=
       importLanguageModules('blockly');
     </script>
-    <script class="remove" type="text/javascript" src="jsongenerator.js"></script>
-    <script class="remove" type="text/javascript" src="unixfilters.js"></script>
-    <script class="remove" type="text/javascript" src="blocklyUnixFilters_lib.js"></script>
-    <script class="remove" type="text/javascript">
+      <script id="test-json" type="application/json">
+         {
+            "steps": [
+              {
+                "number": 1,
+                "command_name": "cat",
+                "return": 1,
+                "stderr": 0,
+                "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
+              },
+              {
+                "number": 2,
+                "command_name": "pipe",
+                "return": 1,
+                "stderr": 0,
+                "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
+              },
+              {
+                "number": 3,
+                "command_name": "grep",
+                "return": 1,
+                "stderr": 0,
+                "output": "pêche\npomme\npoire"
+              },
+              {
+               "number": 4,
+               "command_name": "grep",
+               "return": 1,
+               "stderr": 1,
+               "output": "usage: grep [pattern]"
+             }
+            ]
+          }          
+    </script>
+      <script class="remove" type="text/javascript"
+         src="jsongenerator.js"></script>
+      <script class="remove" type="text/javascript"
+         src="unixfilters.js"></script>
+      <script class="remove" type="text/javascript"
+         src="blocklyUnixFilters_lib.js"></script>
+      <script class="remove" type="text/javascript">
       var json = {
         "id": "unixfilters",
         "language": "fr",
@@ -36,8 +75,8 @@
         "minWidth": "auto"
       };
    </script>
-   <script type="text/javascript" src="task.js"></script>
-   <link rel="stylesheet" type="text/css" href="index.css" />
+      <script type="text/javascript" src="task.js"></script>
+      <link rel="stylesheet" type="text/css" href="index.css" />
    </head>
    <body onresize="task.displayedSubTask.updateScale()">
       <div id="task">
@@ -67,4 +106,3 @@
       </div><!-- task -->
    </body>
 </html>
-
