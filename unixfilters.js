@@ -24,7 +24,12 @@ UnixFilters.reset = function(taskInfos) {
 
 // Define the display
 UnixFilters.resetDisplay = function(context) {
-    $('#grid').html("<h3>Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='output'></pre>");
+    $('#grid').html( "<button id='backToBeginning' onclick='UnixFilters.backToBeginning()'>⏮️Reset</button>"
+        + "<button id='play' onclick='UnixFilters.play()'>▶️Play</button>"
+        + "<button id='step-by-step' onclick='UnixFilters.nextStep()'>👣Step by step</button>"
+        + "<button id='goToEnd' onclick='UnixFilters.end()'>⏭️End</button>"
+        + "<h3> Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='output'></pre>"
+       );
 }
 
 UnixFilters.onChange = function(context) {
@@ -114,48 +119,53 @@ UnixFilters.functions.pipe = function(callback) {
 
 UnixFilters.parseJson = function (jsonData) {
     UnixFilters.stepData = Object.values(jsonData.steps);
-    UnixFilters.stepIndex = 0;
-    
-    Object.values(jsonData.steps).forEach((step) => {
+    UnixFilters.currentIndex = 0;
+    UnixFilters.lastIndex = Object.values(jsonData.steps).length -1;
+    Object.values(jsonData.steps).forEach(() => {
         console.log("parse json called"); 
     });
 }
 
 UnixFilters.nextStep = function () {
-    console.log("next step called with index",UnixFilters.stepIndex)
-    if (!UnixFilters.stepData || UnixFilters.stepIndex >= UnixFilters.stepData.length) {
-        console.log("flop")
+    if (!UnixFilters.stepData || UnixFilters.currentIndex > UnixFilters.lastIndex) {
         return;
     }
-    UnixFilters.showStep(UnixFilters.stepIndex);
-    UnixFilters.stepIndex++;
+    UnixFilters.currentIndex++;
+    UnixFilters.showStep(UnixFilters.currentIndex);
+};
+
+UnixFilters.play = async function () {
+    if (UnixFilters.currentIndex == UnixFilters.lastIndex) {
+        return;
+    };  
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    for (let i = UnixFilters.currentIndex; i <= UnixFilters.lastIndex; i++){
+        UnixFilters.showStep(i);
+        UnixFilters.currentIndex = i;
+        await delay(500);
+    }
+    
+};
+
+UnixFilters.end = function () {
+    UnixFilters.showStep(UnixFilters.lastIndex);
+    UnixFilters.currentIndex = UnixFilters.lastIndex;
+};
+
+UnixFilters.backToBeginning = function () {
+    UnixFilters.showStep(0);
+    UnixFilters.currentIndex = 0;
 };
 
 UnixFilters.showStep = function (index) {
-    console.log("show step called with index:",index)
-    if (!UnixFilters.stepData || index >= UnixFilters.stepData.length || index < 0) {
-        console.log("flop dans show step");
+    if (!UnixFilters.stepData || index > UnixFilters.lastIndex || index < 0) {
         return;
     }
 
     const step = UnixFilters.stepData[index];
-    $('#etape').text(index + 1);
-    if (step.stderr === 0) {
-        $('#output').text(step.output);
-    } else {
-        $('#output').text('error:'+step.output);
-    }
-};
-
-UnixFilters.showStep = function (index) {
-    console.log("show step called with index:", index);
-    if (!UnixFilters.stepData || index >= UnixFilters.stepData.length || index < 0) {
-        console.log("flop dans show step");
-        return;
-    }
-
-    const step = UnixFilters.stepData[index];
-    $('#etape').text(index + 1);
+    $('#etape').text(index);
     if (step.stderr === 0) {
         $('#output').text(step.output);
     } else {
