@@ -30,47 +30,8 @@ function initTask(subTask) {
    subTask.data = {
       easy: [''],
    };
-   initBlocklySubTask(subTask, {
-      player: {
-         mode: 'player',
-         stepDelayMin: 250,
-         stepDelayMax: 1500
-      },
-      afterLoad: function () {
-         context.resetDisplay();
-         subTask.context.loadJsonData && subTask.context.loadJsonData();
 
-      }
-   });
-
-   subTask.step = function () {
-      UnixFilters.nextStep();
-   };
-
-   subTask.backToFirst = function() {
-      UnixFilters.showStep(0);
-      UnixFilters.stepIndex = 0;
-   };
-   
-   subTask.goToEnd = function () {
-      subTask.setStepDelay(0);
-      subTask.play();
-   };   
-
-   subTask.play = function () {
-      const delay = UnixFilters.stepDelay != null ? UnixFilters.stepDelay : 400;
-   
-      const playNext = () => {
-         if (UnixFilters.stepIndex < UnixFilters.stepData.length) {
-            UnixFilters.nextStep();
-            setTimeout(playNext, delay);
-         }
-      };
-      playNext();
-   };   
-
-   subTask.setStepDelay = function (delay) {
-      UnixFilters.stepDelay = delay;
-   };   
+   initBlocklySubTask(subTask);
 }
+
 initWrapper(initTask, ["easy"], null);

@@ -24,10 +24,10 @@ UnixFilters.reset = function(taskInfos) {
 
 // Define the display
 UnixFilters.resetDisplay = function(context) {
-    $('#grid').html( "<button id='backToBeginning' onclick='UnixFilters.backToBeginning()'>⏮️Reset</button>"
-        + "<button id='play' onclick='UnixFilters.play()'>▶️Play</button>"
-        + "<button id='step-by-step' onclick='UnixFilters.nextStep()'>👣Step by step</button>"
-        + "<button id='goToEnd' onclick='UnixFilters.end()'>⏭️End</button>"
+    $('#grid').html( "<button id='backToBeginning' onclick='UnixFilters.backToBeginning()'>Reset</button>"
+        + "<button id='play' onclick='UnixFilters.play()'>Play</button>"
+        + "<button id='step-by-step' onclick='UnixFilters.nextStep()'>Step by step</button>"
+        + "<button id='goToEnd' onclick='UnixFilters.end()'>End</button>"
         + "<h3> Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='output'></pre>"
        );
 }
