@@ -20,38 +20,50 @@
       importLanguageModules('blockly');
     </script>
       <script id="test-json" type="application/json">
-         {
+{
             "steps": [
               {
                 "number": 0,
-                "command_name": "cat",
+                "command_string": "cat",
+                "args": "(fruits.txt)",
                 "return": 1,
                 "stderr": 0,
                 "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
               },
               {
                 "number": 1,
-                "command_name": "pipe",
+                "command_string": "pipe",
+                "args": "()",
                 "return": 1,
                 "stderr": 0,
                 "output": "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi"
               },
               {
                 "number": 2,
-                "command_name": "grep",
+                "command_string": "grep",
+                "args": "(['-i'], 'p')",
                 "return": 1,
                 "stderr": 0,
                 "output": "pêche\npomme\npoire"
               },
+               {
+                "number": 3,
+                "command_string": "pipe",
+                "args": "()",
+                "return": 1,
+                "stderr": 0,
+                "output": "pêche\npomme\npoire"
+             },
               {
-               "number": 3,
-               "command_name": "grep",
-               "return": 1,
-               "stderr": 1,
-               "output": "usage: grep [pattern]"
+                "number": 4,
+                "command_string": "grep",
+                "args": "([], '.o')",
+                "return": 1,
+                "stderr": 0,
+                "output": "pomme\npoire"
              }
             ]
-          }          
+          }        
     </script>
       <script class="remove" type="text/javascript"
          src="jsongenerator.js"></script>
