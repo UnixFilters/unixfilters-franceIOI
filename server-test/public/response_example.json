@@ -1,0 +1,32 @@
+{
+  "steps": [
+    {
+      "number": 0,
+      "command_string": "cat animals.csv",
+      "output": "2012-11-05,deer,5\n2012-11-05,rabbit,22\n2012-11-05,raccoon,7\n2012-11-06,rabbit,19\n2012-11-06,deer,2\n2012-11-06,fox,4\n2012-11-07,rabbit,16\n2012-11-07,bear,1",
+      "stderr": "",
+      "return": 0
+    },
+    {
+      "number": 1,
+      "command_string": "cat animals.csv | head -n 5",
+      "output": "2012-11-05,deer,5\n2012-11-05,rabbit,22\n2012-11-05,raccoon,7\n2012-11-06,rabbit,19\n2012-11-06,deer,2",
+      "stderr": "",
+      "return": 0
+    },
+    {
+      "number": 2,
+      "command_string": "cat animals.csv | head -n 5 | tail -n 3",
+      "output": "2012-11-05,raccoon,7\n2012-11-06,rabbit,19\n2012-11-06,deer,2",
+      "stderr": "",
+      "return": 0
+    },
+    {
+      "number": 3,
+      "command_string": "cat animals.csv | head -n 5 | tail -n 3 | sort -r",
+      "output": "2012-11-06,rabbit,19\n2012-11-06,deer,2\n2012-11-05,raccoon,7",
+      "stderr": "",
+      "return": 0
+    }
+  ]
+}
