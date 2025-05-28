@@ -9,31 +9,26 @@ var getContext = function (display, infos, curLevel) {
         // Labels for the blocks
         cat: "cat",
         grep: "grep",
-        grep_filename: "grep",
         sort: "sort",
         uniq: "uniq",
         head: "head",
-        option_filename: "",
-        // pipe: "|"
+        filename: "",
+        option_k: "-k",
       },
       code: {
         // Names of the functions in Python, or Blockly translated in JavaScript
         cat: "cat",
         grep: "grep",
-        grep_filename: "grep",
         sort: "sort",
         uniq: "uniq",
         head: "head",
-        option_filename: "",
-
-        //   pipe: "pipe",
+        filename: "",
+        option_k: "-k",
       },
       description: {
         // Descriptions of the functions in Python (optional)
         cat: "cat file.txt : affiche le contenu du fichier file.txt",
         grep: "grep 'mot' : affiche les lignes d'entrée contenant le mot 'mot'",
-        grep_filename:
-          "grep 'mot' file.txt : affiche les lignes du fichier file.txt contenant le mot 'mot'",
         sort: "sort : affiche les lignes triées du fichier (par défaut ordre alphabétique)",
         uniq: "uniq : affiche les lignes en supprimant les multiples occurrences consécutives d'une même ligne",
         head: "head",
@@ -136,43 +131,10 @@ var getContext = function (display, infos, curLevel) {
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
    */
 
-  Blockly.Blocks["grep_mutator_container"] = {
-    init: function () {
-      this.jsonInit({
-        type: "grep_mutator_container",
-        message0: "Options grep %1 %2",
-        args0: [
-          { type: "input_dummy" },
-          {
-            type: "input_statement",
-            name: "OPTIONS",
-            check: "grep_option",
-          },
-        ],
-        colour: 285,
-        tooltip: "Ajouter/supprimer des options pour grep",
-        enableContextMenu: false,
-      });
-    },
-  };
-  Blockly.Blocks["grep_mutator_option"] = {
-    init: function () {
-      this.jsonInit({
-        type: "grep_mutator_option",
-        message0: "option",
-        nextStatement: "grep_option",
-        previousStatement: "grep_option",
-        colour: 285,
-        tooltip: "Une option (-v, -i,...)",
-        enableContextMenu: false,
-      });
-    },
-  };
-
   function makeGrepBlock(hasFilename) {
     // Function to make a grep block
     var blockJson = {
-      name: hasFilename ? "grep_filename" : "grep",
+      name: "grep",
       category: "actions",
       colour: 285,
       args0: [
@@ -181,90 +143,21 @@ var getContext = function (display, infos, curLevel) {
           name: "PARAM_0",
           text: "pattern",
         },
+        {
+          type: "input_value",
+          name: "PARAM_OPTION",
+        },
       ],
     };
-
-    if (hasFilename) {
-      blockJson.args0.push({
-        type: "field_input",
-        name: "PARAM_1",
-        text: "filename",
-      });
-    }
 
     var fullBlock = {
       init: function () {
         this.jsonInit(blockJson);
-        this.setMutator(new Blockly.Mutator(["grep_mutator_option"]));
-      },
-      optionCount_: 0,
-      mutationToDom: function () {
-        const container = document.createElement("mutation");
-        container.setAttribute("options", this.optionCount_);
-        return container;
-      },
-      domToMutation: function (xmlElement) {
-        this.optionCount_ = parseInt(xmlElement.getAttribute("options"), 10);
-        this.updateShape_();
-      },
-
-      decompose: function (workspace) {
-        const containerBlock = workspace.newBlock("grep_mutator_container");
-        containerBlock.initSvg();
-        let connection = containerBlock.getInput("OPTIONS").connection;
-        for (let i = 0; i < this.optionCount_; i++) {
-          const optionBlock = workspace.newBlock("grep_mutator_option");
-          optionBlock.initSvg();
-          optionBlock.valueConnection_ = this.getInput(
-            "OPTIONS_SLOT" + i
-          ).connection.targetConnection;
-          connection.connect(optionBlock.previousConnection);
-          connection = optionBlock.nextConnection;
-        }
-        return containerBlock;
-      },
-
-      compose: function (containerBlock) {
-        let optionBlock = containerBlock.getInputTargetBlock("OPTIONS");
-        const connections = [];
-        while (optionBlock) {
-          connections.push(optionBlock.valueConnection_);
-          optionBlock =
-            optionBlock.nextConnection &&
-            optionBlock.nextConnection.targetBlock();
-        }
-        this.optionCount_ = connections.length;
-        this.updateShape_();
-        for (let i = 0; i < connections.length; i++) {
-          if (connections[i]) {
-            this.getInput("OPTIONS_SLOT" + i).connection.connect(
-              connections[i]
-            );
-          }
-        }
-      },
-      updateShape_: function () {
-        if (this.getInput("OPTIONS_SLOT0")) {
-          let i = 0;
-          while (this.getInput("OPTIONS_SLOT" + i)) {
-            this.removeInput("OPTIONS_SLOT" + i);
-            i++;
-          }
-        }
-        for (let i = 0; i < this.optionCount_; i++) {
-          this.appendStatementInput("OPTIONS_SLOT" + i)
-            .setCheck("grep_option")
-            .appendField("option");
-        }
-        if (this.getInput("PATTERN")) {
-          this.moveInputBefore("PATTERN", null);
-        }
       },
     };
 
     var generateCode = function () {
       var pattern = this.getFieldValue("PARAM_0");
-      var filename = hasFilename ? this.getFieldValue("PARAM_1") : null;
       var options = [];
       for (var i = 0; i < this.optionCount_; i++) {
         var optionBlock = this.getInputTargetBlock("OPTIONS_SLOT" + i);
@@ -279,7 +172,6 @@ var getContext = function (display, infos, curLevel) {
         JSON.stringify(options) +
         ", " +
         JSON.stringify(pattern) +
-        (hasFilename ? ", " + JSON.stringify(filename) : "") +
         ");"
       );
     };
@@ -302,8 +194,15 @@ var getContext = function (display, infos, curLevel) {
       name: "option_" + flag,
       blocklyJson: {
         name: "-" + flag,
-        message0: "-" + flag,
+        message0: "-" + flag + "%1",
+        args0: [
+          {
+            type: "input_value",
+            name: "PARAM_TEST",
+          },
+        ],
         colour: 225,
+        output: "null",
       },
     });
 
@@ -323,9 +222,8 @@ var getContext = function (display, infos, curLevel) {
             colour: 250,
             args0: [
               {
-                type: "field_input",
+                type: "input_value",
                 name: "PARAM_0",
-                text: "",
               },
             ],
           },
@@ -336,7 +234,7 @@ var getContext = function (display, infos, curLevel) {
             colour: 250,
             args0: [
               {
-                type: "field_input",
+                type: "input_value",
                 name: "PARAM_0",
                 text: "",
               },
@@ -344,7 +242,7 @@ var getContext = function (display, infos, curLevel) {
           },
         },
         {
-          name: "option_filename",
+          name: "filename",
           blocklyJson: {
             colour: 250,
             args0: [
@@ -354,21 +252,37 @@ var getContext = function (display, infos, curLevel) {
                 text: "fruits.txt",
               },
             ],
+            output: "null",
+          },
+        },
+        {
+          name: "option_k",
+          blocklyJson: {
+            message0: "-k %1 %2",
+            colour: 250,
+            args0: [
+              {
+                type: "field_number",
+                name: "PARAM_0",
+                value: 1,
+                min: 1,
+              },
+              {
+                type: "input_value",
+                name: "PARAM_1",
+                text: "",
+              },
+            ],
+            output: "null",
           },
         },
         makeGrepBlock(false),
         makeGrepBlock(true),
-        {
-          name: "pipe",
-          blocklyJson: {
-            colour: 200,
-          },
-        },
       ],
     },
   };
 
-  var optionBlocks = ["v", "i", "n", "c"];
+  var optionBlocks = ["v", "i", "n", "c", "r", "u"];
   for (var i = 0; i < optionBlocks.length; i++) {
     makeOptionBlock(optionBlocks[i]);
   }

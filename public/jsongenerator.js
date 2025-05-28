@@ -25,82 +25,81 @@ jsonGenerator.robot_start = function (block) {
 
 // test avec les séquentiels
 jsonGenerator.cat = function (block) {
-  const filename = block.getFieldValue("PARAM_0");
-  return `cat ${filename}`;
+  const param = block.getInputTargetBlock("PARAM_0");
+  const options = extractChainedBlocks(param);
+  const optionString = options.join(" ");
+  return `cat ${optionString} `;
 };
 
 jsonGenerator.sort = function (block) {
-  const filename = block.getFieldValue("PARAM_0");
-  return `sort ${filename}`;
+  const param = block.getInputTargetBlock("PARAM_0");
+  const options = extractChainedBlocks(param);
+  const optionString = options.join(" ");
+  return `sort ${optionString} `;
 };
 
-jsonGenerator.option_filename = function (block) {
+jsonGenerator.filename = function (block) {
   const filename = block.getFieldValue("PARAM_0");
   return `${filename}`;
 };
 
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
-  const opts = extractGrepOptions(block);
-  const optionString = opts.join(" ");
-  return `grep ${optionString} ${pattern}`;
+  const optionBlock = block.getInputTargetBlock("PARAM_OPTION");
+  const options = extractChainedBlocks(optionBlock);
+  const optionString = options.join(" ");
+  return `grep ${pattern} ${optionString} `;
 };
 
-jsonGenerator.grep_filename = function (block) {
-  const pattern = block.getFieldValue("PARAM_0");
-  const filename = block.getFieldValue("PARAM_1");
-  const opts = extractGrepOptions(block);
-  const optionString = opts.join(" ");
-  return `grep ${optionString} ${pattern} ${filename}`;
-};
-
-function extractGrepOptions(block) {
-  const authorizedOptions = new Set([
-    "option_i",
-    "option_v",
-    "option_n",
-    "option_c",
-  ]);
-  const optionFlagsMap = {
-    option_i: "-i",
-    option_v: "-v",
-    option_n: "-n",
-    option_c: "-c",
-  };
-
-  const opts = [];
-  let hasInvalid = false;
-
-  for (let i = 0; i < block.optionCount_; i++) {
-    const opt = block.getInputTargetBlock("OPTIONS_SLOT" + i);
-    if (!opt) continue;
-
-    if (authorizedOptions.has(opt.type)) {
-      opts.push(optionFlagsMap[opt.type]);
+function extractChainedBlocks(chainedBlock) {
+  const arguments = [];
+  let current = chainedBlock;
+  while (current) {
+    if (current.type.startsWith("option_")) {
+      // directly put the generated code
+      //const flagtest = jsonGenerator.option_ + current.type.substring(7);
+      //console.log("flagytest", flagtest);
+      const flag = "-" + current.type.substring(7);
+      console.log("le truc", current.type.substring(7));
+      arguments.push(flag);
     } else {
-      opts.push(`[INVALID:${opt.type}]`);
-      hasInvalid = true;
+      const arg = current.getFieldValue("PARAM_0");
+      console.log("arg", arg);
+      arguments.push(arg);
     }
+    current = current.getInputTargetBlock("PARAM_TEST");
   }
-
-  block.setWarningText(
-    hasInvalid ? "One or more options are not valid in this command" : null
-  );
-
-  return opts;
+  return arguments;
 }
 
 jsonGenerator.option_i = function () {
   return "-i";
 };
+
 jsonGenerator.option_v = function () {
   return "-v";
 };
+
 jsonGenerator.option_n = function () {
   return "-n";
 };
+
 jsonGenerator.option_c = function () {
   return "-c";
+};
+
+jsonGenerator.option_r = function () {
+  return "-r";
+};
+
+jsonGenerator.option_u = function () {
+  return "-u";
+};
+
+jsonGenerator.option_k = function (block) {
+  const columnIndex = block.getFieldValue("PARAM_0");
+  console.log("column index", columnIndex);
+  return `-k${columnIndex}`;
 };
 
 jsonGenerator.robot_start = function (block) {
