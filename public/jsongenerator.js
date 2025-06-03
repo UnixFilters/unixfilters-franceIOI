@@ -26,16 +26,17 @@ jsonGenerator.robot_start = function (block) {
 // test avec les séquentiels
 jsonGenerator.cat = function (block) {
   const param = block.getInputTargetBlock("PARAM_0");
-  const options = extractChainedBlocks(param);
+  const [options, filename] = extractChainedBlocks(param);
   const optionString = options.join(" ");
-  return `cat ${optionString} `;
+
+  return `cat ${optionString} ${filename} `;
 };
 
 jsonGenerator.sort = function (block) {
   const param = block.getInputTargetBlock("PARAM_0");
-  const options = extractChainedBlocks(param);
+  const [options, filename] = extractChainedBlocks(param);
   const optionString = options.join(" ");
-  return `sort ${optionString} `;
+  return `sort ${optionString} ${filename} `;
 };
 
 jsonGenerator.filename = function (block) {
@@ -46,30 +47,31 @@ jsonGenerator.filename = function (block) {
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
   const optionBlock = block.getInputTargetBlock("PARAM_OPTION");
-  const options = extractChainedBlocks(optionBlock);
+  const [options, filename] = extractChainedBlocks(optionBlock);
   const optionString = options.join(" ");
-  return `grep ${pattern} ${optionString} `;
+  return `grep ${pattern} ${optionString} ${filename} `;
 };
 
 function extractChainedBlocks(chainedBlock) {
   const arguments = [];
+  let filename = "";
   let current = chainedBlock;
   while (current) {
     if (current.type.startsWith("option_")) {
-      // directly put the generated code
-      //const flagtest = jsonGenerator.option_ + current.type.substring(7);
-      //console.log("flagytest", flagtest);
       const flag = "-" + current.type.substring(7);
-      console.log("le truc", current.type.substring(7));
-      arguments.push(flag);
+      if (current.type == "option_k") {
+        const index = current.getFieldValue("COLUMN_INDEX");
+        arguments.push(flag + index);
+      } else {
+        arguments.push(flag);
+      }
     } else {
       const arg = current.getFieldValue("PARAM_0");
-      console.log("arg", arg);
-      arguments.push(arg);
+      filename = arg;
     }
-    current = current.getInputTargetBlock("PARAM_TEST");
+    current = current.getInputTargetBlock("PARAM_0");
   }
-  return arguments;
+  return [arguments, filename];
 }
 
 jsonGenerator.option_i = function () {
@@ -113,7 +115,7 @@ jsonGenerator.robot_start = function (block) {
     let prev =
       child.previousConnection && child.previousConnection.targetBlock?.();
     if (currentBlockIsCommand && prev.type != "robot_start") {
-      code += " | ";
+      code += "| ";
     }
     code += Array.isArray(snippet) ? snippet[0] : snippet;
     code += "";

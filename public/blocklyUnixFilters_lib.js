@@ -131,7 +131,7 @@ var getContext = function (display, infos, curLevel) {
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
    */
 
-  function makeGrepBlock(hasFilename) {
+  function makeGrepBlock() {
     // Function to make a grep block
     var blockJson = {
       name: "grep",
@@ -156,24 +156,28 @@ var getContext = function (display, infos, curLevel) {
       },
     };
 
-    var generateCode = function () {
+    var generateCode = function (block) {
       var pattern = this.getFieldValue("PARAM_0");
-      var options = [];
-      for (var i = 0; i < this.optionCount_; i++) {
-        var optionBlock = this.getInputTargetBlock("OPTIONS_SLOT" + i);
-        if (optionBlock) {
-          var optionType = optionBlock.type;
-          var flag = "-" + optionType.substring(7);
-          options.push(flag);
-        }
-      }
-      return (
-        "grep(" +
-        JSON.stringify(options) +
-        ", " +
-        JSON.stringify(pattern) +
-        ");"
-      );
+      const paramBlock = block.getInputTargetBlock("PARAM_OPTION");
+      const [options, filename] = extractChainedBlocks(paramBlock);
+      // const optionString = arguments.join(", ");
+      let string = "";
+      filename
+        ? (string =
+            "grep(" +
+            JSON.stringify(options) +
+            ", " +
+            JSON.stringify(pattern) +
+            ", " +
+            JSON.stringify(filename) +
+            ");")
+        : (string =
+            "grep(" +
+            JSON.stringify(options) +
+            ", " +
+            JSON.stringify(pattern) +
+            ");");
+      return string;
     };
 
     return {
@@ -198,7 +202,7 @@ var getContext = function (display, infos, curLevel) {
         args0: [
           {
             type: "input_value",
-            name: "PARAM_TEST",
+            name: "PARAM_0",
           },
         ],
         colour: 225,
@@ -219,7 +223,7 @@ var getContext = function (display, infos, curLevel) {
         {
           name: "cat",
           blocklyJson: {
-            colour: 250,
+            colour: 285,
             args0: [
               {
                 type: "input_value",
@@ -227,11 +231,47 @@ var getContext = function (display, infos, curLevel) {
               },
             ],
           },
+
+          codeGenerators: {
+            Python: function (block) {
+              const paramBloc = block.getInputTargetBlock("PARAM_0");
+              const [options, filename] = extractChainedBlocks(
+                paramBloc || null
+              );
+              let string = "";
+              filename
+                ? (string =
+                    "cat(" +
+                    JSON.stringify(options) +
+                    ", " +
+                    JSON.stringify(filename) +
+                    ");")
+                : (string = "cat(" + JSON.stringify(options) + ");");
+              return string;
+            },
+            JavaScript: function (block) {
+              const paramBloc = block.getInputTargetBlock("PARAM_0");
+              const [options, filename] = extractChainedBlocks(
+                paramBloc || null
+              );
+              let string = "";
+              filename
+                ? (string =
+                    "cat(" +
+                    JSON.stringify(options) +
+                    ", " +
+                    JSON.stringify(filename) +
+                    ");")
+                : (string = "cat(" + JSON.stringify(options) + ");");
+              return string;
+            },
+          },
         },
+
         {
           name: "sort",
           blocklyJson: {
-            colour: 250,
+            colour: 285,
             args0: [
               {
                 type: "input_value",
@@ -240,11 +280,35 @@ var getContext = function (display, infos, curLevel) {
               },
             ],
           },
+          codeGenerators: {
+            Python: function (block) {
+              const paramBloc = block.getInputTargetBlock("PARAM_0");
+              const [options, filename] = extractChainedBlocks(
+                paramBloc || null
+              );
+              let string = "";
+              filename
+                ? (string =
+                    "sort(" +
+                    JSON.stringify(options) +
+                    ", " +
+                    JSON.stringify(filename) +
+                    ");")
+                : (string = "sort(" + JSON.stringify(options) + ");");
+              return string;
+            },
+            JavaScript: function (block) {
+              const paramBloc = block.getInputTargetBlock("PARAM_0");
+              const arguments = extractChainedBlocks(paramBloc || null);
+              const optionString = arguments.join(" ");
+              return `sort(["${optionString}"])`;
+            },
+          },
         },
         {
           name: "filename",
           blocklyJson: {
-            colour: 250,
+            colour: 165,
             args0: [
               {
                 type: "field_input",
@@ -259,17 +323,17 @@ var getContext = function (display, infos, curLevel) {
           name: "option_k",
           blocklyJson: {
             message0: "-k %1 %2",
-            colour: 250,
+            colour: 225,
             args0: [
               {
                 type: "field_number",
-                name: "PARAM_0",
+                name: "COLUMN_INDEX",
                 value: 1,
                 min: 1,
               },
               {
                 type: "input_value",
-                name: "PARAM_1",
+                name: "PARAM_0",
                 text: "",
               },
             ],

@@ -33,6 +33,10 @@ UnixFilters.onChange = function (context) {
   $("#generatedCode").text(
     Array.isArray(generatedCode) ? generatedCode[0] : generatedCode
   );
+  console.log(
+    "python code generated",
+    task.displayedSubTask.blocklyHelper.getCode("python", null, true)
+  );
 };
 
 UnixFilters.sendCommandToServer = async function (commandString) {
