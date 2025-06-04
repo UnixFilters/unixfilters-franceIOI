@@ -18,7 +18,7 @@ UnixFilters.resetDisplay = function (context) {
       "<button id='goToEnd' onclick='UnixFilters.end()'>End</button>" +
       "<h3> Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='jsonStep'></pre><pre id='output'></pre>" +
       "<pre id='commandInput'></pre>" +
-      "<button onclick='UnixFilters.sendCommandToServer(document.getElementById(\"generatedCode\").innerText)'>Lancer la commande</button>"
+      "<button onclick='UnixFilters.sendCommandToServer()'>Lancer la commande</button>"
   );
 };
 
@@ -39,23 +39,29 @@ UnixFilters.onChange = function (context) {
   );
 };
 
-UnixFilters.sendCommandToServer = async function (commandString) {
+UnixFilters.sendCommandToServer = async function () {
   try {
-    console.log(" sending ", commandString);
-    const response = await fetch("http://localhost:3000/run", {
+    let pythonCodeRaw = task.displayedSubTask.blocklyHelper
+      .getCode("python", null, true)
+      .trim();
+    let pythonCode = `commands.${pythonCodeRaw}`;
+    console.log("sending:", pythonCode);
+    const response = await fetch("http://127.0.0.1:5004/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ command: commandString }),
+      body: JSON.stringify({ code: pythonCode }),
     });
+    console.log("RESPONSE", response);
     if (!response.ok) {
       throw new Error("Error sending the request to the server");
     }
 
     const jsonData = await response.json();
-    UnixFilters.parseJson(jsonData);
-    UnixFilters.showStep(UnixFilters.lastIndex);
+    console.log("JSON DATA", jsonData);
+    // UnixFilters.parseJson(jsonData);
+    // UnixFilters.showStep(UnixFilters.lastIndex);
   } catch (error) {
     console.error("Error when sending command:", error);
   }
