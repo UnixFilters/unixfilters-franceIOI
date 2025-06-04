@@ -41,10 +41,9 @@ UnixFilters.onChange = function (context) {
 
 UnixFilters.sendCommandToServer = async function () {
   try {
-    let pythonCodeRaw = task.displayedSubTask.blocklyHelper
+    let pythonCode = task.displayedSubTask.blocklyHelper
       .getCode("python", null, true)
       .trim();
-    let pythonCode = `commands.${pythonCodeRaw}`;
     console.log("sending:", pythonCode);
     const response = await fetch("http://127.0.0.1:5004/run", {
       method: "POST",
@@ -60,8 +59,8 @@ UnixFilters.sendCommandToServer = async function () {
 
     const jsonData = await response.json();
     console.log("JSON DATA", jsonData);
-    // UnixFilters.parseJson(jsonData);
-    // UnixFilters.showStep(UnixFilters.lastIndex);
+    UnixFilters.parseJson(jsonData);
+    UnixFilters.showStep(UnixFilters.lastIndex);
   } catch (error) {
     console.error("Error when sending command:", error);
   }

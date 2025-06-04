@@ -19,6 +19,9 @@ def run_code():
         return jsonify({"error": "code missing"}), 400
 
     python_code = data["code"]
+    print("python code", python_code)
+    python_code_split = python_code.split(";")
+    print("python code split", python_code_split)
 
     # temporary directory
     temp_dir = tempfile.mkdtemp()
@@ -41,7 +44,11 @@ def run_code():
         with open(script_path, "w", encoding="utf-8") as f:
             f.write("import commands\n")
             f.write("commands.reset_output()\n\n")
-            f.write(python_code + "\n\n")
+            for command in python_code_split:
+                command = command.strip()
+                if command:
+                    f.write(f"commands.{command};\n\n")
+
             f.write(
                 "import json\n"
                 "result=commands.get_output()\n"
