@@ -23,6 +23,7 @@ def run_code():
     # temporary directory
     temp_dir = tempfile.mkdtemp()
     try:
+        # files creation
         fruits_content = "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi\n"
         with open(os.path.join(temp_dir, "fruits.txt"), "w", encoding="utf-8") as f:
             f.write(fruits_content)
@@ -35,7 +36,7 @@ def run_code():
             f.write(wages_content)
             shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
 
-        # other files can be added here
+        # Using Python lib to get the output and dumping the JSON object
         script_path = os.path.join(temp_dir, "run_script.py")
         with open(script_path, "w", encoding="utf-8") as f:
             f.write("import commands\n")
@@ -44,7 +45,7 @@ def run_code():
             f.write(
                 "import json\n"
                 "result=commands.get_output()\n"
-                "print(json.dumps({'output':result}))\n"
+                "print(json.dumps(result))\n"
             )
 
         process = subprocess.run(
@@ -66,7 +67,7 @@ def run_code():
             result_json = json.loads(process.stdout)
         except json.JSONDecodeError:
             return (
-                json(
+                jsonify(
                     {
                         "error": "JSON returned by the script is invalid",
                         "stdout": process.stdout,
