@@ -45,14 +45,14 @@ UnixFilters.sendCommandToServer = async function () {
       .getCode("python", null, true)
       .trim();
     console.log("sending:", pythonCode);
-    const response = await fetch("http://127.0.0.1:5004/run", {
+    const response = await fetch("http://127.0.0.1:5004/api/commands", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ code: pythonCode }),
+      body: JSON.stringify({ commands: pythonCode }),
     });
-    console.log("RESPONSE", response);
+
     if (!response.ok) {
       throw new Error("Error sending the request to the server");
     }

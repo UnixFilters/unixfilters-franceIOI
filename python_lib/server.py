@@ -3,7 +3,6 @@ from flask_cors import CORS
 import tempfile
 import os
 import shutil
-import uuid
 import subprocess
 import json
 import commands
@@ -12,13 +11,13 @@ app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 
 
-@app.route("/run", methods=["POST"])
+@app.route("/api/commands", methods=["POST"])
 def run_code():
     data = request.get_json()
-    if not data or "code" not in data:
+    if not data or "commands" not in data:
         return jsonify({"error": "code missing"}), 400
 
-    python_code = data["code"]
+    python_code = data["commands"]
     print("python code", python_code)
     python_code_split = python_code.split(";")
     print("python code split", python_code_split)

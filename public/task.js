@@ -30,6 +30,7 @@ function initTask(subTask) {
       context.success = false;
       throw window.languageStrings.messages.outputCorrect;
     },
+    // startingExample
     computeGrade: function (context, message) {
       var rate = context.success ? 1 : 0;
       return {
