@@ -35,13 +35,14 @@ def get_output():
     return {"steps": [s.to_dict() for s in _steps]}
 
 
-def cat(options=None, filename=None):
+def run_command(command_name, options=None, args=None):
     global _current_output, _command_chain
     if options is None:
         options = []
-    cmd = ["cat"] + options
-    if filename:
-        cmd.append(filename)
+    if args is None:
+        args = []
+
+    cmd = [command_name] + options + args
     cmd_str = " ".join(cmd)
     _command_chain.append(cmd_str)
     full_cmd_str = " | ".join(_command_chain)
@@ -53,7 +54,6 @@ def cat(options=None, filename=None):
         step = CommandStep(
             len(_steps), full_cmd_str, result.stdout, result.stderr, result.returncode
         )
-
         _current_output = result.stdout
     except subprocess.CalledProcessError as error:
         step = CommandStep(
@@ -61,64 +61,20 @@ def cat(options=None, filename=None):
         )
         _current_output = error.stderr or ""
     _steps.append(step)
+
+
+def cat(options=None, filename=None):
+    run_command("cat", options=options, args=[filename] if filename else [])
 
 
 def grep(options=None, pattern=None, filename=None):
-    global _current_output, _command_chain
-    if options is None:
-        options = []
-    cmd = ["grep"] + options
+    args = []
     if pattern:
-        cmd.append(pattern)
+        args.append(pattern)
     if filename:
-        cmd.append(filename)
-    cmd_str = " ".join(cmd)
-    _command_chain.append(cmd_str)
-    full_cmd_str = " | ".join(_command_chain)
-    try:
-        result = subprocess.run(
-            cmd, input=_current_output, capture_output=True, text=True, check=True
-        )
-
-        step = CommandStep(
-            len(_steps), full_cmd_str, result.stdout, result.stderr, result.returncode
-        )
-        _current_output = result.stdout
-    except subprocess.CalledProcessError as error:
-        step = CommandStep(
-            len(_steps), full_cmd_str, "", error.stderr, error.returncode
-        )
-        _current_output = error.stderr or ""
-    _steps.append(step)
+        args.append(filename)
+    run_command("grep", options=options, args=args)
 
 
 def sort(options=None, filename=None):
-    global _current_output, _command_chain
-    if options is None:
-        options = []
-    cmd = ["sort"] + options
-    if filename:
-        cmd.append(filename)
-    cmd_str = " ".join(cmd)
-    _command_chain.append(cmd_str)
-    full_cmd_str = " | ".join(_command_chain)
-
-    try:
-        result = subprocess.run(
-            cmd, input=_current_output, capture_output=True, text=True, check=True
-        )
-        step = CommandStep(
-            len(_steps), full_cmd_str, result.stdout, result.stderr, result.returncode
-        )
-
-        _current_output = result.stdout
-    except subprocess.CalledProcessError as error:
-        step = CommandStep(
-            len(_steps), full_cmd_str, "", error.stderr, error.returncode
-        )
-        _current_output = error.stderr or ""
-    _steps.append(step)
-
-
-def pipe():
-    pass
+    run_command("sort", options=options, args=[filename] if filename else [])
