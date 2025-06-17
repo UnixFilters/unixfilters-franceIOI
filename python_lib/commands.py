@@ -82,3 +82,7 @@ def sort(options=None, filename=None):
 
 def head(options=None, filename=None):
     run_command("head", options=options, args=[filename] if filename else [])
+
+
+def cut(options=None, filename=None):
+    run_command("cut", options=options, args=[filename] if filename else [])

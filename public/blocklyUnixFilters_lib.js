@@ -12,6 +12,7 @@ var getContext = function (display, infos, curLevel) {
         sort: "sort",
         uniq: "uniq",
         head: "head",
+        cut: "cut",
         filename: "",
       },
       code: {
@@ -21,6 +22,7 @@ var getContext = function (display, infos, curLevel) {
         sort: "sort",
         uniq: "uniq",
         head: "head",
+        cut: "cut",
         filename: "",
       },
       description: {
@@ -226,13 +228,14 @@ var getContext = function (display, infos, curLevel) {
 
   // Array defining available options for flags and field indices
   const OPTIONS = [
-    { flag: "v", type: "flag", otherType: false },
-    { flag: "i", type: "flag", otherType: false },
-    { flag: "n", type: ["flag", "field_index"], otherType: true },
-    { flag: "c", type: ["flag", "field_index"], otherType: false },
-    { flag: "r", type: "flag", otherType: false },
-    { flag: "u", type: "flag", otherType: false },
-    { flag: "k", type: "field_index", otherType: false },
+    { flag: "v", type: "flag" },
+    { flag: "i", type: "flag" },
+    { flag: "n", type: ["flag", "field_index"] },
+    { flag: "c", type: ["flag", "field_index"] },
+    { flag: "r", type: "flag" },
+    { flag: "u", type: "flag" },
+    { flag: "k", type: "field_index" },
+    { flag: "d", type: "field_index" },
   ];
 
   // Creates a flag option block for a given flag
@@ -264,13 +267,12 @@ var getContext = function (display, infos, curLevel) {
       blocklyJson: {
         name: "-" + flag,
         message0: `-${flag} %1 %2`,
-        colour: 225,
+        colour: 200,
         args0: [
           {
-            type: "field_number",
+            type: "field_input",
             name: "COLUMN_INDEX",
-            value: 1,
-            min: 1,
+            text: "",
           },
           {
             type: "input_value",
@@ -345,6 +347,25 @@ var getContext = function (display, infos, curLevel) {
             Python: (block) => generateCodeForCommand("head", block, "Python"),
             JavaScript: (block) =>
               generateCodeForCommand("head", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "cut",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+                text: "",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("cut", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("cut", block, "JavaScript"),
           },
         },
 

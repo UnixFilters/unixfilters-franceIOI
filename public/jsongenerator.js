@@ -39,6 +39,7 @@ function makeCommandGenerator(commandName) {
 jsonGenerator.cat = makeCommandGenerator("cat");
 jsonGenerator.sort = makeCommandGenerator("sort");
 jsonGenerator.head = makeCommandGenerator("head");
+jsonGenerator.cut = makeCommandGenerator("cut");
 
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
