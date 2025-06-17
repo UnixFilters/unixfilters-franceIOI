@@ -23,26 +23,22 @@ jsonGenerator.robot_start = function (block) {
   return "";
 };
 
+function makeCommandGenerator(commandName) {
+  return function (block) {
+    const paramBloc = block.getInputTargetBlock("PARAM_0") || null;
+    const [options, filename] = extractChainedBlocks(paramBloc);
+    const parts = [commandName, ...options];
+    if (filename) {
+      parts.push(filename);
+    }
+    return parts.join(" ") + " ";
+  };
+}
+
 // test avec les séquentiels
-jsonGenerator.cat = function (block) {
-  const param = block.getInputTargetBlock("PARAM_0");
-  const [options, filename] = extractChainedBlocks(param);
-  const optionString = options.join(" ");
-
-  return `cat ${optionString} ${filename} `;
-};
-
-jsonGenerator.sort = function (block) {
-  const param = block.getInputTargetBlock("PARAM_0");
-  const [options, filename] = extractChainedBlocks(param);
-  const optionString = options.join(" ");
-  return `sort ${optionString} ${filename} `;
-};
-
-jsonGenerator.filename = function (block) {
-  const filename = block.getFieldValue("PARAM_0");
-  return `${filename}`;
-};
+jsonGenerator.cat = makeCommandGenerator("cat");
+jsonGenerator.sort = makeCommandGenerator("sort");
+jsonGenerator.head = makeCommandGenerator("head");
 
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
@@ -52,6 +48,11 @@ jsonGenerator.grep = function (block) {
   return `grep ${pattern} ${optionString} ${filename} `;
 };
 
+jsonGenerator.filename = function (block) {
+  const filename = block.getFieldValue("PARAM_0");
+  return `${filename}`;
+};
+
 function extractChainedBlocks(chainedBlock) {
   const arguments = [];
   let filename = "";
@@ -59,7 +60,8 @@ function extractChainedBlocks(chainedBlock) {
   while (current) {
     if (current.type.startsWith("option_")) {
       const flag = "-" + current.type.substring(7);
-      if (current.type == "option_k") {
+      // todo: find another method for options with column index
+      if (current.type == "option_k" || current.type == "option_n_number") {
         const index = current.getFieldValue("COLUMN_INDEX");
         arguments.push(flag + index);
       } else {
@@ -102,6 +104,12 @@ jsonGenerator.option_k = function (block) {
   const columnIndex = block.getFieldValue("PARAM_0");
   console.log("column index", columnIndex);
   return `-k${columnIndex}`;
+};
+
+jsonGenerator.option_n_number = function (block) {
+  const columnIndex = block.getFieldValue("PARAM_0");
+  console.log("column index", columnIndex);
+  return `-n${columnIndex}`;
 };
 
 jsonGenerator.robot_start = function (block) {
