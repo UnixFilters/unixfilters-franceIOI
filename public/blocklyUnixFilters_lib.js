@@ -13,7 +13,6 @@ var getContext = function (display, infos, curLevel) {
         uniq: "uniq",
         head: "head",
         filename: "",
-        option_k: "-k",
       },
       code: {
         // Names of the functions in Python, or Blockly translated in JavaScript
@@ -23,7 +22,6 @@ var getContext = function (display, infos, curLevel) {
         uniq: "uniq",
         head: "head",
         filename: "",
-        option_k: "-k",
       },
       description: {
         // Descriptions of the functions in Python (optional)
@@ -192,13 +190,58 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
-  function makeOptionBlock(flag) {
-    // Make a block for an option
+  // Generates code for a command using the extracted options and/or filename
+  function generateCodeForCommand(commandName, block, lang) {
+    // lang is not used because we generate the same code for both
+    const paramBlock = block.getInputTargetBlock("PARAM_0");
+    const [options, filename] = extractChainedBlocks(paramBlock || null);
+    let string = "";
+    // builds the code string base on the filename's presence
+    string = filename
+      ? `${commandName}(${JSON.stringify(options)}, ${JSON.stringify(
+          filename
+        )});`
+      : `${commandName}(${JSON.stringify(options)});`;
+    return string;
+  }
+
+  // Creates blocks for options based on their type (flag or field index)
+  function makeOptionBlock(optionObject) {
+    if (Array.isArray(optionObject.type)) {
+      optionObject.type.forEach((type) => {
+        if (type === "field_index") {
+          makeFieldIndexBlock(optionObject.flag);
+        } else if (type === "flag") {
+          makeFlagBlock(optionObject.flag);
+        }
+      });
+    } else {
+      if (optionObject.type === "field_index") {
+        makeFieldIndexBlock(optionObject.flag);
+      } else if (optionObject.type === "flag") {
+        makeFlagBlock(optionObject.flag);
+      }
+    }
+  }
+
+  // Array defining available options for flags and field indices
+  const OPTIONS = [
+    { flag: "v", type: "flag", otherType: false },
+    { flag: "i", type: "flag", otherType: false },
+    { flag: "n", type: ["flag", "field_index"], otherType: true },
+    { flag: "c", type: ["flag", "field_index"], otherType: false },
+    { flag: "r", type: "flag", otherType: false },
+    { flag: "u", type: "flag", otherType: false },
+    { flag: "k", type: "field_index", otherType: false },
+  ];
+
+  // Creates a flag option block for a given flag
+  function makeFlagBlock(flag) {
     context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag,
+      name: "option_" + flag + "_flag",
       blocklyJson: {
         name: "-" + flag,
-        message0: "-" + flag + "%1",
+        message0: `-${flag} %1`,
         args0: [
           {
             type: "input_value",
@@ -209,9 +252,38 @@ var getContext = function (display, infos, curLevel) {
         output: "null",
       },
     });
+    context.unixfilters["option_" + flag + "_flag"] = function () {
+      UnixFilters.currentOptions.push("-" + flag + "_flag");
+    };
+  }
 
-    context.unixfilters["option_" + flag] = function () {
-      UnixFilters.currentOptions.push("-" + flag);
+  // Creates a field index option block for a given flag
+  function makeFieldIndexBlock(flag) {
+    context.customBlocks.unixfilters.actions.push({
+      name: "option_" + flag + "_field_index",
+      blocklyJson: {
+        name: "-" + flag,
+        message0: `-${flag} %1 %2`,
+        colour: 225,
+        args0: [
+          {
+            type: "field_number",
+            name: "COLUMN_INDEX",
+            value: 1,
+            min: 1,
+          },
+          {
+            type: "input_value",
+            name: "PARAM_0",
+            text: "",
+          },
+        ],
+        output: "null",
+      },
+    });
+
+    context.unixfilters["option_" + flag + "_field_index"] = function () {
+      UnixFilters.currentOptions.push("-" + flag + "_field_index");
     };
   }
 
@@ -231,40 +303,10 @@ var getContext = function (display, infos, curLevel) {
               },
             ],
           },
-
           codeGenerators: {
-            Python: function (block) {
-              const paramBloc = block.getInputTargetBlock("PARAM_0");
-              const [options, filename] = extractChainedBlocks(
-                paramBloc || null
-              );
-              let string = "";
-              filename
-                ? (string =
-                    "cat(" +
-                    JSON.stringify(options) +
-                    ", " +
-                    JSON.stringify(filename) +
-                    ");")
-                : (string = "cat(" + JSON.stringify(options) + ");");
-              return string;
-            },
-            JavaScript: function (block) {
-              const paramBloc = block.getInputTargetBlock("PARAM_0");
-              const [options, filename] = extractChainedBlocks(
-                paramBloc || null
-              );
-              let string = "";
-              filename
-                ? (string =
-                    "cat(" +
-                    JSON.stringify(options) +
-                    ", " +
-                    JSON.stringify(filename) +
-                    ");")
-                : (string = "cat(" + JSON.stringify(options) + ");");
-              return string;
-            },
+            Python: (block) => generateCodeForCommand("cat", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("cat", block, "JavaScript"),
           },
         },
 
@@ -281,30 +323,31 @@ var getContext = function (display, infos, curLevel) {
             ],
           },
           codeGenerators: {
-            Python: function (block) {
-              const paramBloc = block.getInputTargetBlock("PARAM_0");
-              const [options, filename] = extractChainedBlocks(
-                paramBloc || null
-              );
-              let string = "";
-              filename
-                ? (string =
-                    "sort(" +
-                    JSON.stringify(options) +
-                    ", " +
-                    JSON.stringify(filename) +
-                    ");")
-                : (string = "sort(" + JSON.stringify(options) + ");");
-              return string;
-            },
-            JavaScript: function (block) {
-              const paramBloc = block.getInputTargetBlock("PARAM_0");
-              const arguments = extractChainedBlocks(paramBloc || null);
-              const optionString = arguments.join(" ");
-              return `sort(["${optionString}"])`;
-            },
+            Python: (block) => generateCodeForCommand("sort", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("sort", block, "JavaScript"),
           },
         },
+
+        {
+          name: "head",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+                text: "",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("head", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("head", block, "JavaScript"),
+          },
+        },
+
         {
           name: "filename",
           blocklyJson: {
@@ -319,37 +362,14 @@ var getContext = function (display, infos, curLevel) {
             output: "null",
           },
         },
-        {
-          name: "option_k",
-          blocklyJson: {
-            message0: "-k %1 %2",
-            colour: 225,
-            args0: [
-              {
-                type: "field_number",
-                name: "COLUMN_INDEX",
-                value: 1,
-                min: 1,
-              },
-              {
-                type: "input_value",
-                name: "PARAM_0",
-                text: "",
-              },
-            ],
-            output: "null",
-          },
-        },
-        makeGrepBlock(false),
-        makeGrepBlock(true),
+        makeGrepBlock(),
       ],
     },
   };
 
-  var optionBlocks = ["v", "i", "n", "c", "r", "u"];
-  for (var i = 0; i < optionBlocks.length; i++) {
-    makeOptionBlock(optionBlocks[i]);
-  }
+  OPTIONS.forEach((option) => {
+    makeOptionBlock(option);
+  });
 
   // Color indexes of block categories (as a hue in the range 0–420)
   context.provideBlocklyColours = function () {

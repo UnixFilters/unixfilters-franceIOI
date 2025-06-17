@@ -78,3 +78,7 @@ def grep(options=None, pattern=None, filename=None):
 
 def sort(options=None, filename=None):
     run_command("sort", options=options, args=[filename] if filename else [])
+
+
+def head(options=None, filename=None):
+    run_command("head", options=options, args=[filename] if filename else [])

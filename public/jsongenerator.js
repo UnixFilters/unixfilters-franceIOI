@@ -59,9 +59,9 @@ function extractChainedBlocks(chainedBlock) {
   let current = chainedBlock;
   while (current) {
     if (current.type.startsWith("option_")) {
-      const flag = "-" + current.type.substring(7);
+      const flag = "-" + current.type.substring(7, 8);
       // todo: find another method for options with column index
-      if (current.type == "option_k" || current.type == "option_n_number") {
+      if (current.type.includes("field_index")) {
         const index = current.getFieldValue("COLUMN_INDEX");
         arguments.push(flag + index);
       } else {

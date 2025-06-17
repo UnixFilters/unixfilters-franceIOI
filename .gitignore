@@ -1,3 +1,4 @@
 public/bebras-modules/
 node_modules/
 test-unix.code-workspace
+.DS_Store
