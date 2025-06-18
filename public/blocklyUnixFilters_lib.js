@@ -13,7 +13,13 @@ var getContext = function (display, infos, curLevel) {
         uniq: "uniq",
         head: "head",
         cut: "cut",
+        tail: "tail",
+        tee: "tee",
+        tr: "tr",
+        uniq: "uniq",
+        wc: "wc",
         filename: "",
+        option_d_dropdown: "-d",
       },
       code: {
         // Names of the functions in Python, or Blockly translated in JavaScript
@@ -23,7 +29,10 @@ var getContext = function (display, infos, curLevel) {
         uniq: "uniq",
         head: "head",
         cut: "cut",
-        filename: "",
+        tail: "tail",
+        tee: "tee",
+        tr: "tr",
+        uniq: "uniq",
       },
       description: {
         // Descriptions of the functions in Python (optional)
@@ -235,7 +244,13 @@ var getContext = function (display, infos, curLevel) {
     { flag: "r", type: "flag" },
     { flag: "u", type: "flag" },
     { flag: "k", type: "field_index" },
-    { flag: "d", type: "field_index" },
+    { flag: "d", type: ["flag", "field_index"] },
+    { flag: "f", type: "field_index" },
+    { flag: "a", type: "flag" },
+    { flag: "s", type: "flag" },
+    { flag: "w", type: "flag" },
+    { flag: "l", type: "flag" },
+    { flag: "m", type: "flag" },
   ];
 
   // Creates a flag option block for a given flag
@@ -289,6 +304,43 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
+  function makeDropdownBlock() {
+    var blockJson = {
+      name: "option_d_dropdown",
+      colour: 225,
+      message0: "-d %1 %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "DELIMITER",
+          options: [
+            [";", ";"],
+            [":", ":"],
+            [",", ","],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "PARAM_0",
+        },
+      ],
+      output: null,
+      colour: 225,
+    };
+
+    var fullBlock = {
+      init: function () {
+        this.jsonInit(blockJson);
+      },
+    };
+
+    return {
+      name: blockJson.name,
+      category: blockJson.category,
+      blocklyJson: blockJson,
+      fullBlock: fullBlock,
+    };
+  }
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
@@ -320,7 +372,6 @@ var getContext = function (display, infos, curLevel) {
               {
                 type: "input_value",
                 name: "PARAM_0",
-                text: "",
               },
             ],
           },
@@ -339,7 +390,6 @@ var getContext = function (display, infos, curLevel) {
               {
                 type: "input_value",
                 name: "PARAM_0",
-                text: "",
               },
             ],
           },
@@ -358,7 +408,6 @@ var getContext = function (display, infos, curLevel) {
               {
                 type: "input_value",
                 name: "PARAM_0",
-                text: "",
               },
             ],
           },
@@ -366,6 +415,96 @@ var getContext = function (display, infos, curLevel) {
             Python: (block) => generateCodeForCommand("cut", block, "Python"),
             JavaScript: (block) =>
               generateCodeForCommand("cut", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "tail",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("tail", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("tail", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "tee",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("tee", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("tee", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "tr",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("tr", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("tr", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "uniq",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("uniq", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("uniq", block, "JavaScript"),
+          },
+        },
+
+        {
+          name: "wc",
+          blocklyJson: {
+            colour: 285,
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+          },
+          codeGenerators: {
+            Python: (block) => generateCodeForCommand("wc", block, "Python"),
+            JavaScript: (block) =>
+              generateCodeForCommand("wc", block, "JavaScript"),
           },
         },
 
@@ -383,6 +522,8 @@ var getContext = function (display, infos, curLevel) {
             output: "null",
           },
         },
+
+        makeDropdownBlock(),
         makeGrepBlock(),
       ],
     },

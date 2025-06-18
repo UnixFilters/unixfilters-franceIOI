@@ -86,3 +86,23 @@ def head(options=None, filename=None):
 
 def cut(options=None, filename=None):
     run_command("cut", options=options, args=[filename] if filename else [])
+
+
+def tail(options=None, filename=None):
+    run_command("tail", options=options, args=[filename] if filename else [])
+
+
+def tee(options=None, filename=None):
+    run_command("tee", options=options, args=[filename] if filename else [])
+
+
+def tr(options=None, filename=None):
+    run_command("tr", options=options, args=[filename] if filename else [])
+
+
+def uniq(options=None, filename=None):
+    run_command("uniq", options=options, args=[filename] if filename else [])
+
+
+def wc(options=None, filename=None):
+    run_command("wc", options=options, args=[filename] if filename else [])

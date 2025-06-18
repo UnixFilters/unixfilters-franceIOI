@@ -18,17 +18,18 @@ def run_code():
         return jsonify({"error": "code missing"}), 400
 
     python_code = data["commands"]
-    print("python code", python_code)
+    print("python code: ", python_code)
     python_code_split = python_code.split(";")
-    print("python code split", python_code_split)
+    print("python code split: ", python_code_split)
 
     # temporary directory
     temp_dir = tempfile.mkdtemp()
     try:
         # files creation
-        fruits_content = "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi\n"
+        fruits_content = "pêche\npomme\npoire\nabricot\nbanane\nfraise\nkiwi\npomme\n"
         with open(os.path.join(temp_dir, "fruits.txt"), "w", encoding="utf-8") as f:
             f.write(fruits_content)
+
         wages_content = (
             "alice 7200\nbob 4800\nclaire 9100\n"
             "daniel 3150\neve 6700\nfrank 10000\n"
@@ -38,6 +39,15 @@ def run_code():
             f.write(wages_content)
             shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
 
+        ages_content = (
+            "alice:72\nbob:48\nclaire:34\n"
+            "daniel:31\neve:67\nfrank:57\n"
+            "george:49\nhannah:55\nirene:43\njack:78\n"
+        )
+        with open(os.path.join(temp_dir, "ages.txt"), "w", encoding="utf-8") as f:
+            f.write(ages_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
         # Using Python lib to get the output and dumping the JSON object
         script_path = os.path.join(temp_dir, "run_script.py")
         with open(script_path, "w", encoding="utf-8") as f:
@@ -45,8 +55,13 @@ def run_code():
             f.write("commands.reset_output()\n\n")
             for command in python_code_split:
                 command = command.strip()
+                # f.write('commands.sort(["-n", "-k", "2"], "wages.txt")' + "\n")
+                # f.write('commands.cut(["-d", ":", "-f1"], "ages.txt")' + "\n")
+                # f.write('commands.cut(["-c", "-3"], "ages.txt")' + "\n")
+
                 if command:
-                    f.write(f"commands.{command};\n\n")
+                    print(f"commands." + command + "\n")
+                    f.write(f"commands." + command + "\n")
 
             f.write(
                 "import json\n"

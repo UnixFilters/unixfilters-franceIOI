@@ -40,6 +40,11 @@ jsonGenerator.cat = makeCommandGenerator("cat");
 jsonGenerator.sort = makeCommandGenerator("sort");
 jsonGenerator.head = makeCommandGenerator("head");
 jsonGenerator.cut = makeCommandGenerator("cut");
+jsonGenerator.tail = makeCommandGenerator("tail");
+jsonGenerator.tee = makeCommandGenerator("tee");
+jsonGenerator.tr = makeCommandGenerator("tr");
+jsonGenerator.uniq = makeCommandGenerator("uniq");
+jsonGenerator.wc = makeCommandGenerator("wc");
 
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
@@ -65,6 +70,9 @@ function extractChainedBlocks(chainedBlock) {
       if (current.type.includes("field_index")) {
         const index = current.getFieldValue("COLUMN_INDEX");
         arguments.push(flag + index);
+      } else if (current.type.includes("dropdown")) {
+        const delimiter = current.getFieldValue("DELIMITER");
+        arguments.push(flag + delimiter);
       } else {
         arguments.push(flag);
       }
@@ -113,6 +121,11 @@ jsonGenerator.option_n_number = function (block) {
   return `-n${columnIndex}`;
 };
 
+jsonGenerator.option_d_dropdown = function (block) {
+  const delimiter = block.getFieldValue("DELIMITER");
+  console.log("delimiter", delimiter);
+  return `-d'${delimiter}'`;
+};
 jsonGenerator.robot_start = function (block) {
   let code = "";
   let child = block.getNextBlock();
