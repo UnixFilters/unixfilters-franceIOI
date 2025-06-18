@@ -207,7 +207,7 @@ var getContext = function (display, infos, curLevel) {
     const paramBlock = block.getInputTargetBlock("PARAM_0");
     const [options, filename] = extractChainedBlocks(paramBlock || null);
     let string = "";
-    // builds the code string base on the filename's presence
+    // Builds the code string based on the filename's presence
     string = filename
       ? `${commandName}(${JSON.stringify(options)}, ${JSON.stringify(
           filename
@@ -341,173 +341,32 @@ var getContext = function (display, infos, curLevel) {
       fullBlock: fullBlock,
     };
   }
+
+  // Creates a block for a given command name
+  function createUnixFilterBlock(commandName) {
+    return {
+      name: commandName,
+      blocklyJson: {
+        colour: 285,
+        args0: [
+          {
+            type: "input_value",
+            name: "PARAM_0",
+          },
+        ],
+      },
+      codeGenerators: {
+        Python: (block) => generateCodeForCommand(commandName, block, "Python"),
+        JavaScript: (block) =>
+          generateCodeForCommand(commandName, block, "JavaScript"),
+      },
+    };
+  }
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
       // Categories are reflected in the Blockly menu
       actions: [
-        {
-          name: "cat",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("cat", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("cat", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "sort",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("sort", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("sort", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "head",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("head", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("head", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "cut",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("cut", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("cut", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "tail",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("tail", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("tail", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "tee",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("tee", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("tee", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "tr",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("tr", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("tr", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "uniq",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("uniq", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("uniq", block, "JavaScript"),
-          },
-        },
-
-        {
-          name: "wc",
-          blocklyJson: {
-            colour: 285,
-            args0: [
-              {
-                type: "input_value",
-                name: "PARAM_0",
-              },
-            ],
-          },
-          codeGenerators: {
-            Python: (block) => generateCodeForCommand("wc", block, "Python"),
-            JavaScript: (block) =>
-              generateCodeForCommand("wc", block, "JavaScript"),
-          },
-        },
-
         {
           name: "filename",
           blocklyJson: {
@@ -531,6 +390,24 @@ var getContext = function (display, infos, curLevel) {
 
   OPTIONS.forEach((option) => {
     makeOptionBlock(option);
+  });
+
+  const commandNames = [
+    "cat",
+    "sort",
+    "head",
+    "cut",
+    "tail",
+    "tee",
+    "tr",
+    "uniq",
+    "wc",
+  ];
+
+  commandNames.forEach((command) => {
+    context.customBlocks.unixfilters.actions.push(
+      createUnixFilterBlock(command)
+    );
   });
 
   // Color indexes of block categories (as a hue in the range 0–420)
