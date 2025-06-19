@@ -106,3 +106,7 @@ def uniq(options=None, filename=None):
 
 def wc(options=None, filename=None):
     run_command("wc", options=options, args=[filename] if filename else [])
+
+
+def sed(options=None, filename=None):
+    run_command("sed", options=options, args=[filename] if filename else [])

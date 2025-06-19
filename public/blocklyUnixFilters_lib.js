@@ -18,6 +18,7 @@ var getContext = function (display, infos, curLevel) {
         tr: "tr",
         uniq: "uniq",
         wc: "wc",
+        sed: "sed",
         filename: "",
         option_d_dropdown: "-d",
       },
@@ -402,6 +403,7 @@ var getContext = function (display, infos, curLevel) {
     "tr",
     "uniq",
     "wc",
+    "sed",
   ];
 
   commandNames.forEach((command) => {

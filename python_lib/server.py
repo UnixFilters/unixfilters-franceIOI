@@ -60,7 +60,6 @@ def run_code():
                 # f.write('commands.cut(["-c", "-3"], "ages.txt")' + "\n")
 
                 if command:
-                    print(f"commands." + command + "\n")
                     f.write(f"commands." + command + "\n")
 
             f.write(

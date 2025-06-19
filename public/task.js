@@ -16,6 +16,7 @@ function initTask(subTask) {
           "tr",
           "uniq",
           "wc",
+          "sed",
           "filename",
           "option_d_dropdown",
           "option_i_flag",

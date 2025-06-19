@@ -45,6 +45,7 @@ jsonGenerator.tee = makeCommandGenerator("tee");
 jsonGenerator.tr = makeCommandGenerator("tr");
 jsonGenerator.uniq = makeCommandGenerator("uniq");
 jsonGenerator.wc = makeCommandGenerator("wc");
+jsonGenerator.sed = makeCommandGenerator("sed");
 
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_0");
