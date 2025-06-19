@@ -19,6 +19,7 @@ var getContext = function (display, infos, curLevel) {
         uniq: "uniq",
         wc: "wc",
         sed: "sed",
+        noop: "",
         filename: "",
         option_d_dropdown: "-d",
       },
@@ -34,6 +35,7 @@ var getContext = function (display, infos, curLevel) {
         tee: "tee",
         tr: "tr",
         uniq: "uniq",
+        noop: "",
       },
       description: {
         // Descriptions of the functions in Python (optional)
@@ -102,6 +104,15 @@ var getContext = function (display, infos, curLevel) {
     }
   };
 
+  if (context.display) {
+    const wsContainer = document.querySelector("#blocklyLibContent");
+    if (wsContainer) {
+      function handleMouseEnter(event) {
+        UnixFilters.removeNoops(context);
+      }
+      wsContainer.addEventListener("mouseenter", handleMouseEnter);
+    }
+  }
   /***** Functions *****/
   // For each function in UnixFilters.functions, we define a function
   // that will be called when the block is executed
@@ -150,12 +161,12 @@ var getContext = function (display, infos, curLevel) {
       args0: [
         {
           type: "field_input",
-          name: "PARAM_0",
+          name: "PATTERN",
           text: "pattern",
         },
         {
           type: "input_value",
-          name: "PARAM_OPTION",
+          name: "PARAM_0",
         },
       ],
     };
@@ -167,8 +178,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     var generateCode = function (block) {
-      var pattern = this.getFieldValue("PARAM_0");
-      const paramBlock = block.getInputTargetBlock("PARAM_OPTION");
+      var pattern = this.getFieldValue("PATTERN");
+      const paramBlock = block.getInputTargetBlock("PARAM_0");
       const [options, filename] = extractChainedBlocks(paramBlock);
       // const optionString = arguments.join(", ");
       let string = "";
@@ -382,6 +393,36 @@ var getContext = function (display, infos, curLevel) {
             output: "null",
           },
         },
+
+        {
+          name: "noop_option_flag",
+          blocklyJson: {
+            type: "noop",
+            message0: "",
+            colour: 225,
+            output: "null",
+          },
+        },
+
+        // {
+        //   name: "noop_option_field_index",
+        //   blocklyJson: {
+        //     type: "noop",
+        //     message0: "",
+        //     colour: 200,
+        //     output: "null",
+        //   },
+        // },
+
+        // {
+        //   name: "noop_command",
+        //   blocklyJson: {
+        //     type: "noop",
+        //     message0: "",
+        //     colour: 285,
+        //     output: "null",
+        //   },
+        // },
 
         makeDropdownBlock(),
         makeGrepBlock(),

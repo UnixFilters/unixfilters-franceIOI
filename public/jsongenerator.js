@@ -48,8 +48,8 @@ jsonGenerator.wc = makeCommandGenerator("wc");
 jsonGenerator.sed = makeCommandGenerator("sed");
 
 jsonGenerator.grep = function (block) {
-  const pattern = block.getFieldValue("PARAM_0");
-  const optionBlock = block.getInputTargetBlock("PARAM_OPTION");
+  const pattern = block.getFieldValue("PATTERN");
+  const optionBlock = block.getInputTargetBlock("PARAM_0");
   const [options, filename] = extractChainedBlocks(optionBlock);
   const optionString = options.join(" ");
   return `grep ${pattern} ${optionString} ${filename} `;
@@ -77,7 +77,7 @@ function extractChainedBlocks(chainedBlock) {
       } else {
         arguments.push(flag);
       }
-    } else {
+    } else if (current.type == "filename") {
       const arg = current.getFieldValue("PARAM_0");
       filename = arg;
     }
@@ -127,6 +127,7 @@ jsonGenerator.option_d_dropdown = function (block) {
   console.log("delimiter", delimiter);
   return `-d'${delimiter}'`;
 };
+
 jsonGenerator.robot_start = function (block) {
   let code = "";
   let child = block.getNextBlock();

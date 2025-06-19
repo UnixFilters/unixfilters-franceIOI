@@ -12,14 +12,23 @@ UnixFilters.reset = function (taskInfos) {
 // Define the display
 UnixFilters.resetDisplay = function (context) {
   $("#grid").html(
-    "<button id='backToBeginning' onclick='UnixFilters.backToBeginning()'>Reset</button>" +
-      "<button id='play' onclick='UnixFilters.play()'>Play</button>" +
-      "<button id='step-by-step' onclick='UnixFilters.nextStep()'>Step by step</button>" +
-      "<button id='goToEnd' onclick='UnixFilters.end()'>End</button>" +
+    "<button id='backToBeginning'>Reset</button>" +
+      "<button id='play'>Play</button>" +
+      "<button id='step-by-step'>Step by step</button>" +
+      "<button id='goToEnd'>End</button>" +
       "<h3> Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='jsonStep'></pre><pre id='output'></pre>" +
       "<pre id='commandInput'></pre>" +
-      "<button onclick='UnixFilters.sendCommandToServer()'>Lancer la commande</button>"
+      "<button id='launchCommand'>Lancer la commande</button>"
   );
+
+  $("#backToBeginning").on("click", UnixFilters.backToBeginning);
+  $("#play").on("click", UnixFilters.play);
+  $("#step-by-step").on("click", UnixFilters.nextStep);
+  $("#goToEnd").on("click", UnixFilters.end);
+  $("#launchCommand").on("click", function () {
+    UnixFilters.fillEmptyOptionInputs(context);
+    UnixFilters.sendCommandToServer();
+  });
 };
 
 UnixFilters.onChange = function (context) {
@@ -39,6 +48,56 @@ UnixFilters.onChange = function (context) {
   );
 };
 
+UnixFilters.fillEmptyOptionInputs = function (context) {
+  console.log("fillEmptyOptionInput");
+  const allBlocks = context.blocklyHelper.workspace.getAllBlocks(false);
+
+  for (const block of allBlocks) {
+    console.log("block", block.type);
+    const input = block.getInput("PARAM_0");
+    if (input && !input.connection.isConnected()) {
+      const dummyBlock =
+        context.blocklyHelper.workspace.newBlock("noop_option_flag");
+      console.log("dummy", dummyBlock);
+      dummyBlock.initSvg();
+      dummyBlock.render();
+      input.connection.connect(dummyBlock.outputConnection);
+      // if (block.type == "option_flag") {
+      //   const dummyBlock =
+      //     context.blocklyHelper.workspace.newBlock("noop_option_flag");
+      //   console.log("dummy", dummyBlock);
+      //   dummyBlock.initSvg();
+      //   dummyBlock.render();
+      //   input.connection.connect(dummyBlock.outputConnection);
+      // } else if (block.type == "option_field_index") {
+      //   const dummyBlock = context.blocklyHelper.workspace.newBlock(
+      //     "noop_option_field_index"
+      //   );
+      //   console.log("dummy", dummyBlock);
+      //   dummyBlock.initSvg();
+      //   dummyBlock.render();
+      //   input.connection.connect(dummyBlock.outputConnection);
+      // } else {
+      //   const dummyBlock =
+      //     context.blocklyHelper.workspace.newBlock("noop_command");
+      //   console.log("dummy", dummyBlock);
+      //   dummyBlock.initSvg();
+      //   dummyBlock.render();
+      //   input.connection.connect(dummyBlock.outputConnection);
+      // }
+    }
+  }
+};
+
+UnixFilters.removeNoops = function (context) {
+  console.log("removeNoop");
+  context.blocklyHelper.workspace.getAllBlocks().forEach(function (block) {
+    if (block.type.startsWith("noop")) {
+      block.dispose();
+    }
+  });
+};
+
 UnixFilters.sendCommandToServer = async function () {
   try {
     let pythonCode = task.displayedSubTask.blocklyHelper
@@ -54,7 +113,13 @@ UnixFilters.sendCommandToServer = async function () {
     });
 
     if (!response.ok) {
-      throw new Error("Error sending the request to the server");
+      const errorData = await response.json();
+      // UnixFilters.parseJson(errorData);
+      // $("#output").text(errorData.error);
+      console.error("Error response:", errorData);
+      throw new Error(
+        `Error sending the request to the server: ${errorData.error}`
+      );
     }
 
     const jsonData = await response.json();
