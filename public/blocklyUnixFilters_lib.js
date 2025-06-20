@@ -233,6 +233,8 @@ var getContext = function (display, infos, curLevel) {
           makeFieldIndexBlock(optionObject.flag);
         } else if (type === "flag") {
           makeFlagBlock(optionObject.flag);
+        } else if (type == "delimiter") {
+          makeDelimiterBlock(optionObject.flag);
         }
       });
     } else {
@@ -240,6 +242,8 @@ var getContext = function (display, infos, curLevel) {
         makeFieldIndexBlock(optionObject.flag);
       } else if (optionObject.type === "flag") {
         makeFlagBlock(optionObject.flag);
+      } else if (type == "delimiter") {
+        makeDelimiterBlock(optionObject.flag);
       }
     }
   }
@@ -253,13 +257,14 @@ var getContext = function (display, infos, curLevel) {
     { flag: "r", type: "flag" },
     { flag: "u", type: "flag" },
     { flag: "k", type: "field_index" },
-    { flag: "d", type: ["flag", "field_index"] },
+    { flag: "d", type: ["flag", "delimiter"] },
     { flag: "f", type: "field_index" },
     { flag: "a", type: "flag" },
     { flag: "s", type: "flag" },
     { flag: "w", type: "flag" },
     { flag: "l", type: "flag" },
     { flag: "m", type: "flag" },
+    { flag: "e", type: "flag" },
   ];
 
   // Creates a flag option block for a given flag
@@ -295,7 +300,36 @@ var getContext = function (display, infos, curLevel) {
         args0: [
           {
             type: "field_input",
-            name: "COLUMN_INDEX",
+            name: "PARAM_1",
+            text: "",
+          },
+          {
+            type: "input_value",
+            name: "PARAM_0",
+            text: "",
+          },
+        ],
+        output: "null",
+      },
+    });
+
+    context.unixfilters["option_" + flag + "_field_index"] = function () {
+      UnixFilters.currentOptions.push("-" + flag + "_field_index");
+    };
+  }
+
+  // Creates a delimiter option block for a given flag
+  function makeDelimiterBlock(flag) {
+    context.customBlocks.unixfilters.actions.push({
+      name: "option_" + flag + "_delimiter",
+      blocklyJson: {
+        name: "-" + flag,
+        message0: `-${flag} "%1" %2`,
+        colour: 200,
+        args0: [
+          {
+            type: "field_input",
+            name: "PARAM_1",
             text: "",
           },
           {

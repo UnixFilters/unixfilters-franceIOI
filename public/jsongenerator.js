@@ -68,9 +68,13 @@ function extractChainedBlocks(chainedBlock) {
     if (current.type.startsWith("option_")) {
       const flag = "-" + current.type.substring(7, 8);
       // todo: find another method for options with column index
-      if (current.type.includes("field_index")) {
-        const index = current.getFieldValue("COLUMN_INDEX");
-        arguments.push(flag + index);
+      if (
+        current.type.includes("field_index") ||
+        current.type.includes("delimiter")
+      ) {
+        const index = current.getFieldValue("PARAM_1");
+        arguments.push(flag);
+        arguments.push(index);
       } else {
         arguments.push(flag);
       }
