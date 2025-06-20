@@ -48,49 +48,36 @@ UnixFilters.onChange = function (context) {
   );
 };
 
+function getNoopTypeFromBlockType(blockType) {
+  if (blockType.endsWith("_flag")) {
+    return "noop_option_flag";
+  } else if (blockType.endsWith("_field_index")) {
+    return "noop_option_field_index";
+  }
+  return "noop_command";
+}
+
 UnixFilters.fillEmptyOptionInputs = function (context) {
-  console.log("fillEmptyOptionInput");
   const allBlocks = context.blocklyHelper.workspace.getAllBlocks(false);
 
   for (const block of allBlocks) {
-    console.log("block", block.type);
     const input = block.getInput("PARAM_0");
-    if (input && !input.connection.isConnected()) {
-      const dummyBlock =
-        context.blocklyHelper.workspace.newBlock("noop_option_flag");
-      console.log("dummy", dummyBlock);
+    if (!input) continue;
+
+    if (!input.connection.isConnected()) {
+      let expectedType = null;
+      console.log("block type", block.type);
+      expectedType = getNoopTypeFromBlockType(block.type);
+
+      const dummyBlock = context.blocklyHelper.workspace.newBlock(expectedType);
       dummyBlock.initSvg();
       dummyBlock.render();
       input.connection.connect(dummyBlock.outputConnection);
-      // if (block.type == "option_flag") {
-      //   const dummyBlock =
-      //     context.blocklyHelper.workspace.newBlock("noop_option_flag");
-      //   console.log("dummy", dummyBlock);
-      //   dummyBlock.initSvg();
-      //   dummyBlock.render();
-      //   input.connection.connect(dummyBlock.outputConnection);
-      // } else if (block.type == "option_field_index") {
-      //   const dummyBlock = context.blocklyHelper.workspace.newBlock(
-      //     "noop_option_field_index"
-      //   );
-      //   console.log("dummy", dummyBlock);
-      //   dummyBlock.initSvg();
-      //   dummyBlock.render();
-      //   input.connection.connect(dummyBlock.outputConnection);
-      // } else {
-      //   const dummyBlock =
-      //     context.blocklyHelper.workspace.newBlock("noop_command");
-      //   console.log("dummy", dummyBlock);
-      //   dummyBlock.initSvg();
-      //   dummyBlock.render();
-      //   input.connection.connect(dummyBlock.outputConnection);
-      // }
     }
   }
 };
 
 UnixFilters.removeNoops = function (context) {
-  console.log("removeNoop");
   context.blocklyHelper.workspace.getAllBlocks().forEach(function (block) {
     if (block.type.startsWith("noop")) {
       block.dispose();

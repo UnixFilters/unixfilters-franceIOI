@@ -18,7 +18,6 @@ function initTask(subTask) {
           "wc",
           "sed",
           "filename",
-          "option_d_dropdown",
           "option_i_flag",
           "option_v_flag",
           "option_i_flag",
