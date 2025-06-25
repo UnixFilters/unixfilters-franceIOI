@@ -53,6 +53,8 @@ function getNoopTypeFromBlockType(blockType) {
     return "noop_option_flag";
   } else if (blockType.endsWith("_field_index")) {
     return "noop_option_field_index";
+  } else if (blockType.startsWith("text")) {
+    return "noop_text";
   }
   return "noop_command";
 }

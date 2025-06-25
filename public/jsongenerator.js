@@ -26,11 +26,8 @@ jsonGenerator.robot_start = function (block) {
 function makeCommandGenerator(commandName) {
   return function (block) {
     const paramBloc = block.getInputTargetBlock("PARAM_0") || null;
-    const [options, filename] = extractChainedBlocks(paramBloc);
-    const parts = [commandName, ...options];
-    if (filename) {
-      parts.push(filename);
-    }
+    const [arguments] = extractChainedBlocks(paramBloc);
+    const parts = [commandName, ...arguments];
     return parts.join(" ") + " ";
   };
 }
@@ -50,78 +47,103 @@ jsonGenerator.sed = makeCommandGenerator("sed");
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PATTERN");
   const optionBlock = block.getInputTargetBlock("PARAM_0");
-  const [options, filename] = extractChainedBlocks(optionBlock);
-  const optionString = options.join(" ");
-  return `grep ${pattern} ${optionString} ${filename} `;
+  const [arguments] = extractChainedBlocks(optionBlock);
+  const optionString = arguments.join(" ");
+  return `grep ${pattern} ${optionString} `;
 };
 
 jsonGenerator.filename = function (block) {
-  const filename = block.getFieldValue("PARAM_0");
+  const filename = block.getFieldValue("PARAM_1");
   return `${filename}`;
 };
 
+jsonGenerator.text_input = function (block) {
+  const text = block.getFieldValue("PARAM_1");
+  return `${text}`;
+};
+
+jsonGenerator.symbol_greater_than = function () {
+  return `>`;
+};
+
+jsonGenerator.symbol_even_greater_than = function () {
+  return `>>`;
+};
+
+jsonGenerator.symbol_less_than = function () {
+  return `<`;
+};
+
+function sanitizeDelimiter(rawValue) {
+  // console.log("raw value", rawValue);
+  // console.log("typeof rawValue:", typeof rawValue);
+  // console.log("rawValue length:", rawValue ? rawValue.length : "N/A");
+  // console.log("wtf?", rawValue != " ");
+  // if (rawValue && rawValue != " ") {
+  //   console.log("replace");
+  //   return rawValue.replace(/^['"]|['"]$/g, "");
+  // } else {
+  //   console.log("nothing");
+  // }
+}
+
 function extractChainedBlocks(chainedBlock) {
   const arguments = [];
-  let filename = "";
+  // let filename = "";
   let current = chainedBlock;
   while (current) {
+    // If the block encountered is an option block
     if (current.type.startsWith("option_")) {
       const flag = "-" + current.type.substring(7, 8);
       // todo: find another method for options with column index
+      // If the option has an input
       if (
         current.type.includes("field_index") ||
         current.type.includes("delimiter")
       ) {
-        const index = current.getFieldValue("PARAM_1");
+        let value = current.getFieldValue("PARAM_1");
+
+        // only sanitize if it's a delimiter-type block
+        if (current.type.includes("delimiter")) {
+          value = sanitizeDelimiter(value);
+        }
+
         arguments.push(flag);
-        arguments.push(index);
-      } else {
+        arguments.push(value);
+      }
+      // If the option doesn't have an input
+      else {
         arguments.push(flag);
       }
-    } else if (current.type == "filename") {
-      const arg = current.getFieldValue("PARAM_0");
-      filename = arg;
     }
+    // If it's not an option, it can be a filename
+    else if (current.type == "filename") {
+      const filename = current.getFieldValue("PARAM_1");
+      arguments.push(filename);
+    }
+    // Or a text input
+    else if (current.type == "text_input") {
+      const text = current.getFieldValue("PARAM_1");
+      arguments.push(text);
+    }
+    // todo: find another structure to handle the symbols
+    // Or a symbol
+    else if (current.type == "symbol_greater_than") {
+      arguments.push(jsonGenerator.symbol_greater_than());
+    }
+    // Or a symbol
+    else if (current.type == "symbol_less_than") {
+      arguments.push(jsonGenerator.symbol_less_than());
+    } else if (current.type == "symbol_even_greater_than") {
+      arguments.push(jsonGenerator.symbol_even_greater_than());
+    }
+    // Move on to the next block attached
     current = current.getInputTargetBlock("PARAM_0");
   }
-  return [arguments, filename];
+  // This structure isn't relevant anymore, because it's options + filename + symbol + text input so
+  // there are multiple different arguments
+  return [arguments];
 }
-
-jsonGenerator.option_i = function () {
-  return "-i";
-};
-
-jsonGenerator.option_v = function () {
-  return "-v";
-};
-
-jsonGenerator.option_n = function () {
-  return "-n";
-};
-
-jsonGenerator.option_c = function () {
-  return "-c";
-};
-
-jsonGenerator.option_r = function () {
-  return "-r";
-};
-
-jsonGenerator.option_u = function () {
-  return "-u";
-};
-
-jsonGenerator.option_k = function (block) {
-  const columnIndex = block.getFieldValue("PARAM_0");
-  console.log("column index", columnIndex);
-  return `-k${columnIndex}`;
-};
-
-jsonGenerator.option_n_number = function (block) {
-  const columnIndex = block.getFieldValue("PARAM_0");
-  console.log("column index", columnIndex);
-  return `-n${columnIndex}`;
-};
 
 jsonGenerator.robot_start = function (block) {
   let code = "";
@@ -129,6 +151,7 @@ jsonGenerator.robot_start = function (block) {
   while (child) {
     const snippet = jsonGenerator.blockToCode(child, false);
     // if the block name doesn't start with 'option' it's a command
+    // not true anymore bc there are new blocks
     // todo: improve the way it's checked
     const currentBlockIsCommand = !child.type.startsWith("option_");
     let prev =

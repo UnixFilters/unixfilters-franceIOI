@@ -8,6 +8,10 @@ function initTask(subTask) {
         unixfilters: [
           "cat",
           "grep",
+          "symbol_greater_than",
+          "symbol_even_greater_than",
+          "symbol_less_than",
+          "text_input",
           "sort",
           "head",
           "cut",

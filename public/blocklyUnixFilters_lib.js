@@ -20,6 +20,9 @@ var getContext = function (display, infos, curLevel) {
         wc: "wc",
         sed: "sed",
         filename: "",
+        symbol_greater_than: ">",
+        symbol_even_greater_than: ">>",
+        symbol_less_than: "<",
       },
       code: {
         // Names of the functions in Python, or Blockly translated in JavaScript
@@ -177,24 +180,11 @@ var getContext = function (display, infos, curLevel) {
     var generateCode = function (block) {
       var pattern = this.getFieldValue("PATTERN");
       const paramBlock = block.getInputTargetBlock("PARAM_0");
-      const [options, filename] = extractChainedBlocks(paramBlock);
+      const [arguments] = extractChainedBlocks(paramBlock);
+      arguments.unshift(pattern);
       // const optionString = arguments.join(", ");
       let string = "";
-      filename
-        ? (string =
-            "grep(" +
-            JSON.stringify(options) +
-            ", " +
-            JSON.stringify(pattern) +
-            ", " +
-            JSON.stringify(filename) +
-            ");")
-        : (string =
-            "grep(" +
-            JSON.stringify(options) +
-            ", " +
-            JSON.stringify(pattern) +
-            ");");
+      string = "grep(" + JSON.stringify(arguments) + ");";
       return string;
     };
 
@@ -214,14 +204,10 @@ var getContext = function (display, infos, curLevel) {
   function generateCodeForCommand(commandName, block, lang) {
     // lang is not used because we generate the same code for both
     const paramBlock = block.getInputTargetBlock("PARAM_0");
-    const [options, filename] = extractChainedBlocks(paramBlock || null);
+    const [arguments] = extractChainedBlocks(paramBlock || null);
     let string = "";
     // Builds the code string based on the filename's presence
-    string = filename
-      ? `${commandName}(${JSON.stringify(options)}, ${JSON.stringify(
-          filename
-        )});`
-      : `${commandName}(${JSON.stringify(options)});`;
+    string = `${commandName}(${JSON.stringify(arguments)});`;
     return string;
   }
 
@@ -324,7 +310,7 @@ var getContext = function (display, infos, curLevel) {
       name: "option_" + flag + "_delimiter",
       blocklyJson: {
         name: "-" + flag,
-        message0: `-${flag} "%1" %2`,
+        message0: `-${flag} %1 %2`,
         colour: 200,
         args0: [
           {
@@ -379,7 +365,7 @@ var getContext = function (display, infos, curLevel) {
             args0: [
               {
                 type: "field_input",
-                name: "PARAM_0",
+                name: "PARAM_1",
                 text: "fruits.txt",
               },
             ],
@@ -417,11 +403,84 @@ var getContext = function (display, infos, curLevel) {
           },
         },
 
+        {
+          name: "noop_text",
+          blocklyJson: {
+            type: "noop",
+            message0: "",
+            colour: 90,
+            output: "null",
+          },
+        },
+
+        {
+          name: "symbol_greater_than",
+          blocklyJson: {
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+            colour: 25,
+            output: "null",
+          },
+        },
+
+        {
+          name: "symbol_even_greater_than",
+          blocklyJson: {
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+            colour: 25,
+            output: "null",
+          },
+        },
+
+        {
+          name: "symbol_less_than",
+          blocklyJson: {
+            args0: [
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+            colour: 50,
+            output: "null",
+          },
+        },
+
+        {
+          name: "text_input",
+          blocklyJson: {
+            message0: `%1 %2`,
+            args0: [
+              {
+                type: "field_input",
+                name: "PARAM_1",
+                text: "a-z",
+              },
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+            output: null,
+            colour: 90,
+          },
+        },
+
         makeGrepBlock(),
       ],
     },
   };
 
+  // options / commands / filename / other (><,..;)
   OPTIONS.forEach((option) => {
     makeOptionBlock(option);
   });
