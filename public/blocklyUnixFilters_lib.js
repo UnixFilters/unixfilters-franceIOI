@@ -202,7 +202,7 @@ var getContext = function (display, infos, curLevel) {
 
   // Generates code for a command using the extracted options and/or filename
   function generateCodeForCommand(commandName, block, lang) {
-    // lang is not used because we generate the same code for both
+    // lang is not used because we generate the same code for both Python and JavaScript
     const paramBlock = block.getInputTargetBlock("PARAM_0");
     const [arguments] = extractChainedBlocks(paramBlock || null);
     let string = "";
@@ -228,7 +228,7 @@ var getContext = function (display, infos, curLevel) {
         makeFieldIndexBlock(optionObject.flag);
       } else if (optionObject.type === "flag") {
         makeFlagBlock(optionObject.flag);
-      } else if (type == "delimiter") {
+      } else if (optionObject.type == "delimiter") {
         makeDelimiterBlock(optionObject.flag);
       }
     }
@@ -244,6 +244,7 @@ var getContext = function (display, infos, curLevel) {
     { flag: "u", type: "flag" },
     { flag: "k", type: "field_index" },
     { flag: "d", type: ["flag", "delimiter"] },
+    { flag: "t", type: "delimiter" },
     { flag: "f", type: "field_index" },
     { flag: "a", type: "flag" },
     { flag: "s", type: "flag" },

@@ -1,4 +1,4 @@
-import subprocess
+import sys, subprocess, traceback, json
 
 
 class CommandStep:
@@ -35,25 +35,62 @@ def get_output():
     return {"steps": [s.to_dict() for s in _steps]}
 
 
-def run_command(command_name, options=None, args=None):
+def run_command(command_name, arguments=None):
     global _current_output, _command_chain
-    if options is None:
-        options = []
-    if args is None:
-        args = []
+    if arguments is None:
+        arguments = []
+    redirection_in = None
+    redirection_out = None
 
-    cmd = [command_name] + options + args
-    cmd_str = " ".join(cmd)
+    cmd_temp = [command_name] + arguments
+    cmd_str = " ".join(cmd_temp)
     _command_chain.append(cmd_str)
     full_cmd_str = " | ".join(_command_chain)
 
+    while ">" in arguments:
+        idx = arguments.index(">")
+        redirection_out = True
+        filename_redirection_out = arguments.pop(idx + 1)
+        arguments.pop(idx)
+
+    while "<" in arguments:
+        idx = arguments.index("<")
+        redirection_in = True
+        filename_redirection_in = arguments.pop(idx + 1)
+        arguments.pop(idx)
+
+    # Remove empty arguments (temporary)
+    for arg in arguments:
+        if arg.strip() == "":
+            index = arguments.index(arg)
+            arguments.pop(index)
+
+    cmd = [command_name] + arguments
+
     try:
-        result = subprocess.run(
-            cmd, input=_current_output, capture_output=True, text=True, check=True
-        )
+
+        if redirection_in:
+            with open(filename_redirection_in, "r") as infile:
+                result = subprocess.run(
+                    cmd, input=infile.read(), capture_output=True, text=True, check=True
+                )
+        elif redirection_out:
+            with open(filename_redirection_out, "w") as outfile:
+                result = subprocess.run(
+                    cmd,
+                    input=_current_output,
+                    text=True,
+                    check=True,
+                    stdout=outfile,
+                )
+        else:
+            result = subprocess.run(
+                cmd, input=_current_output, capture_output=True, text=True, check=True
+            )
         step = CommandStep(
             len(_steps), full_cmd_str, result.stdout, result.stderr, result.returncode
         )
+
         _current_output = result.stdout
     except subprocess.CalledProcessError as error:
         step = CommandStep(
@@ -63,50 +100,62 @@ def run_command(command_name, options=None, args=None):
     _steps.append(step)
 
 
-def cat(options=None, filename=None):
-    run_command("cat", options=options, args=[filename] if filename else [])
+def cat(arguments=None):
+    run_command("cat", arguments=arguments)
 
 
-def grep(options=None, pattern=None, filename=None):
-    args = []
+def grep(arguments=None, pattern=None):
     if pattern:
-        args.append(pattern)
-    if filename:
-        args.append(filename)
-    run_command("grep", options=options, args=args)
+        arguments.append(pattern)
+    run_command("grep", arguments=arguments)
 
 
-def sort(options=None, filename=None):
-    run_command("sort", options=options, args=[filename] if filename else [])
+def sort(arguments=None):
+    run_command("sort", arguments=arguments)
 
 
-def head(options=None, filename=None):
-    run_command("head", options=options, args=[filename] if filename else [])
+def head(arguments=None):
+    run_command("head", arguments=arguments)
 
 
-def cut(options=None, filename=None):
-    run_command("cut", options=options, args=[filename] if filename else [])
+def cut(arguments=None):
+    run_command("cut", arguments=arguments)
 
 
-def tail(options=None, filename=None):
-    run_command("tail", options=options, args=[filename] if filename else [])
+def tail(arguments=None):
+    run_command("tail", arguments=arguments)
 
 
-def tee(options=None, filename=None):
-    run_command("tee", options=options, args=[filename] if filename else [])
+def tee(arguments=None):
+    run_command("tee", arguments=arguments)
 
 
-def tr(options=None, filename=None):
-    run_command("tr", options=options, args=[filename] if filename else [])
+def tr(arguments=None):
+    run_command("tr", arguments=arguments)
 
 
-def uniq(options=None, filename=None):
-    run_command("uniq", options=options, args=[filename] if filename else [])
+def uniq(arguments=None):
+    run_command("uniq", arguments=arguments)
 
 
-def wc(options=None, filename=None):
-    run_command("wc", options=options, args=[filename] if filename else [])
+def wc(arguments=None):
+    run_command("wc", arguments=arguments)
 
 
-def sed(options=None, filename=None):
-    run_command("sed", options=options, args=[filename] if filename else [])
+def sed(arguments=None):
+    run_command("sed", arguments=arguments)
+
+
+# # Executer le programme
+# try:
+#     with open("solution.py") as f:
+#         code = compile(f.read(), "solution.py", "exec")
+#         exec(code)
+# except:
+#     # Enlever le runner du traceback en cas d'erreur
+#     excInfo = sys.exc_info()
+#     traceback.print_exception(excInfo[0], excInfo[1], excInfo[2].tb_next)
+#     sys.exit(1)
+
+# # Afficher les steps
+# print(json.dumps(get_output(), indent=4))

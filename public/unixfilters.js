@@ -13,12 +13,16 @@ UnixFilters.reset = function (taskInfos) {
 UnixFilters.resetDisplay = function (context) {
   $("#grid").html(
     "<button id='backToBeginning'>Reset</button>" +
-      "<button id='play'>Play</button>" +
+      "<button id='launchCommand'>Exécuter</button>" +
       "<button id='step-by-step'>Step by step</button>" +
       "<button id='goToEnd'>End</button>" +
-      "<h3> Code généré</h3><pre id='generatedCode'></pre><h3>Sortie courante</h3><pre id='jsonStep'></pre><pre id='output'></pre>" +
-      "<pre id='commandInput'></pre>" +
-      "<button id='launchCommand'>Lancer la commande</button>"
+      "<h3> Code généré</h3>" +
+      "<pre id='generatedCode'></pre>" +
+      "<h3>Étape en cours</h3>" +
+      "<pre id='jsonStep'></pre>" +
+      "<h3>Sortie courante</h3>" +
+      "<pre id='output'></pre>" +
+      "<pre id='commandInput'></pre>"
   );
 
   $("#backToBeginning").on("click", UnixFilters.backToBeginning);
@@ -103,9 +107,9 @@ UnixFilters.sendCommandToServer = async function () {
 
     if (!response.ok) {
       const errorData = await response.json();
-      // UnixFilters.parseJson(errorData);
-      // $("#output").text(errorData.error);
       console.error("Error response:", errorData);
+      document.getElementById("output").style.color = "red";
+      $("#output").text("Server error");
       throw new Error(
         `Error sending the request to the server: ${errorData.error}`
       );
@@ -137,20 +141,6 @@ UnixFilters.nextStep = function () {
   UnixFilters.showStep(UnixFilters.currentIndex);
 };
 
-UnixFilters.play = async function () {
-  if (UnixFilters.currentIndex == UnixFilters.lastIndex) {
-    return;
-  }
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  for (let i = UnixFilters.currentIndex; i <= UnixFilters.lastIndex; i++) {
-    UnixFilters.showStep(i);
-    UnixFilters.currentIndex = i;
-    await delay(500);
-  }
-};
-
 UnixFilters.end = function () {
   UnixFilters.showStep(UnixFilters.lastIndex);
   UnixFilters.currentIndex = UnixFilters.lastIndex;
@@ -165,14 +155,18 @@ UnixFilters.showStep = function (index) {
   if (!UnixFilters.stepData || index > UnixFilters.lastIndex || index < 0) {
     return;
   }
-
   const step = UnixFilters.stepData[index];
   $("#etape").text(index);
-  $("#jsonStep").text("command: " + step.command_string);
+  $("#jsonStep").text(step.command_string);
   if (step.return === 0) {
-    document.getElementById("output").style.color = "white";
-    $("#output").text(step.output);
-  } else {
+    if (step.output == "") {
+      document.getElementById("output").style.color = "grey";
+      $("#output").text("Sortie vide");
+    } else {
+      document.getElementById("output").style.color = "white";
+      $("#output").text(step.output);
+    }
+  } else if (step.return != 0) {
     document.getElementById("output").style.color = "red";
     $("#output").text(step.stderr);
   }

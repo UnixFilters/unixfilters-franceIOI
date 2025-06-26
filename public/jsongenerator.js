@@ -75,6 +75,7 @@ jsonGenerator.symbol_less_than = function () {
 };
 
 function sanitizeDelimiter(rawValue) {
+  // si il y a des quotes, remplacer ?
   // console.log("raw value", rawValue);
   // console.log("typeof rawValue:", typeof rawValue);
   // console.log("rawValue length:", rawValue ? rawValue.length : "N/A");
@@ -104,9 +105,9 @@ function extractChainedBlocks(chainedBlock) {
         let value = current.getFieldValue("PARAM_1");
 
         // only sanitize if it's a delimiter-type block
-        if (current.type.includes("delimiter")) {
-          value = sanitizeDelimiter(value);
-        }
+        // if (current.type.includes("delimiter")) {
+        //   value = sanitizeDelimiter(value);
+        // }
 
         arguments.push(flag);
         arguments.push(value);

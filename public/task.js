@@ -33,6 +33,7 @@ function initTask(subTask) {
           "option_k_field_index",
           "option_c_field_index",
           "option_d_delimiter",
+          "option_t_delimiter",
           "option_f_field_index",
           "option_a_flag",
           "option_d_flag",

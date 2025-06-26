@@ -20,7 +20,6 @@ def run_code():
     python_code = data["commands"]
     print("python code: ", python_code)
     python_code_split = python_code.split(";")
-    print("python code split: ", python_code_split)
 
     # temporary directory
     temp_dir = tempfile.mkdtemp()
@@ -48,6 +47,41 @@ def run_code():
             f.write(ages_content)
             shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
 
+        books_content = "Le Petit Prince - Antoine de Saint-Exupéry\n1984 - George Orwell\nHarry Potter - J.K. Rowling\nLe Seigneur des Anneaux - J.R.R. Tolkien\nDune - Frank Herbert\nFondation - Isaac Asimov"
+        with open(os.path.join(temp_dir, "livres.txt"), "w", encoding="utf-8") as f:
+            f.write(books_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
+        journal_content = (
+            "Aujourd'hui il fait beau. J'ai rencontré mes amis au parc. Nous avons joué au football. "
+            "C'était une excellente journée !"
+        )
+        with open(os.path.join(temp_dir, "journal.txt"), "w", encoding="utf-8") as f:
+            f.write(journal_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
+        archives_content = "15/08/2020\n22/05/2019\n10/01/2021\n01/11/2022"
+        with open(os.path.join(temp_dir, "archives.txt"), "w", encoding="utf-8") as f:
+            f.write(archives_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
+        presentations_content = "Erreur critique dans le systèME. C'est une ERREUR qu'on doit corriger. Erreur et rectification nécessaires."
+        with open(
+            os.path.join(temp_dir, "presentation.txt"), "w", encoding="utf-8"
+        ) as f:
+            f.write(presentations_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
+        transactions_content = (
+            "ID,Client,Montant,Date\n1,John,250,2025-06-01\n2,Alice,1500,2025-06-02\n3,Bob,750,2025-06-03\n"
+            + "4,Charlie,3000,2025-06-04\n5,David,1200,2025-06-05\n6,Eve,500,2025-06-06\n7,Frank,1700,2025-06-07\n"
+        )
+        with open(
+            os.path.join(temp_dir, "transactions.txt"), "w", encoding="utf-8"
+        ) as f:
+            f.write(transactions_content)
+            shutil.copy("commands.py", os.path.join(temp_dir, "commands.py"))
+
         # Using Python lib to get the output and dumping the JSON object
         script_path = os.path.join(temp_dir, "run_script.py")
         with open(script_path, "w", encoding="utf-8") as f:
@@ -55,10 +89,6 @@ def run_code():
             f.write("commands.reset_output()\n\n")
             for command in python_code_split:
                 command = command.strip()
-                # f.write('commands.sort(["-n", "-k", "2"], "wages.txt")' + "\n")
-                # f.write('commands.cut(["-d", ":", "-f1"], "ages.txt")' + "\n")
-                # f.write('commands.cut(["-c", "-3"], "ages.txt")' + "\n")
-
                 if command:
                     f.write(f"commands." + command + "\n")
 
