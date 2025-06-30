@@ -25,6 +25,10 @@ git clone https://github.com/France-ioi/bebras-modules.git
 Mettre en place l'environnement virtuel pour le serveur Python
 
 ```bash
+cd ../python_lib
+```
+
+```bash
 python3 -m venv venv
 ```
 
@@ -40,13 +44,21 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-Lancer le serveur python dans un environnement virtuel
+Installer flask et lancer le serveur python dans un environnement virtuel
+
+```bash
+pip install flask-cors
+```
 
 ```bash
 python3 server.py
 ```
 
-Lancer le serveur node à la racine
+Installer les dépendances et lancer le serveur node à la racine unixfilters-franceIOI
+
+```bash
+npm install
+```
 
 ```bash
 node server.js
@@ -58,7 +70,8 @@ URL en développement : http://localhost:3000
 
 1. Générer un code Blockly depuis l'interface
 
-2. Lors du clic sur le bouton **_Exécuter_**, le code est enregistré dans tests/gen/solution.py
+2. Copier le code généré par les blocs dans solutoon.py
+   (maintenant : Lors du clic sur le bouton **_Exécuter_**, le code est enregistré dans tests/gen/solution.py)
    Exemple :
 
 ```python
@@ -86,7 +99,7 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 ├── index.html --> contenu de la tâche\
 ├── jsongenerator.js --> génération du code pour chaque bloc\
 ├── task.js --> contient les paramètres de la tâche (blocs disponibles, nombre de blocs autorisés,...)\
-└── unixfilters.js --> logique de l'affichage et de l'envoi de la commande au serveur\
+└── unixfilters.js --> logique de l'affichage et de l'envoi de la commande au serveur
 
 ### Aide
 
@@ -96,7 +109,7 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 
 .\
 ├── commands.py --> librairie définissant les différents filtres et exécutant la commande\
-└── server.py --> reçoit le code généré par les blocs et utilise la librairie pour récupérer le résultat et le renvoyer au front\
+└── server.py --> reçoit le code généré par les blocs et utilise la librairie pour récupérer le résultat et le renvoyer au front
 
 PAS PAREIL QUAND LE BLOC EST UNE COMMANDE OU UN SYMBOLE
 
