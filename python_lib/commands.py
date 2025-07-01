@@ -38,14 +38,23 @@ def get_output():
 def run_command(command_name, arguments=None):
     global _current_output, _command_chain
     if arguments is None:
+        print("no arguments")
         arguments = []
     redirection_in = None
     redirection_out = None
+    redirection_out_append = False
 
     cmd_temp = [command_name] + arguments
     cmd_str = " ".join(cmd_temp)
     _command_chain.append(cmd_str)
     full_cmd_str = " | ".join(_command_chain)
+
+    while ">>" in arguments:
+        idx = arguments.index(">>")
+        redirection_out = True
+        redirection_out_append = True
+        filename_redirection_out = arguments.pop(idx + 1)
+        arguments.pop(idx)
 
     while ">" in arguments:
         idx = arguments.index(">")
@@ -59,12 +68,6 @@ def run_command(command_name, arguments=None):
         filename_redirection_in = arguments.pop(idx + 1)
         arguments.pop(idx)
 
-    # Remove empty arguments (temporary)
-    for arg in arguments:
-        if arg.strip() == "":
-            index = arguments.index(arg)
-            arguments.pop(index)
-
     cmd = [command_name] + arguments
 
     try:
@@ -75,7 +78,8 @@ def run_command(command_name, arguments=None):
                     cmd, input=infile.read(), capture_output=True, text=True, check=True
                 )
         elif redirection_out:
-            with open(filename_redirection_out, "w") as outfile:
+            mode = "a" if redirection_out_append else "w"
+            with open(filename_redirection_out, mode) as outfile:
                 result = subprocess.run(
                     cmd,
                     input=_current_output,
