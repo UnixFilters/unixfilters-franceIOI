@@ -26,8 +26,8 @@ jsonGenerator.robot_start = function (block) {
 function makeCommandGenerator(commandName) {
   return function (block) {
     const paramBloc = block.getInputTargetBlock("PARAM_0") || null;
-    const [arguments] = extractChainedBlocksForCodeShownToUser(paramBloc);
-    const parts = [commandName, ...arguments];
+    const [args] = extractChainedBlocksForCodeShownToUser(paramBloc);
+    const parts = [commandName, ...args];
     return parts.join(" ") + " ";
   };
 }
@@ -45,10 +45,10 @@ jsonGenerator.wc = makeCommandGenerator("wc");
 jsonGenerator.sed = makeCommandGenerator("sed");
 
 jsonGenerator.grep = function (block) {
-  const pattern = block.getFieldValue("PATTERN");
+  const pattern = block.getFieldValue("PARAM_1");
   const optionBlock = block.getInputTargetBlock("PARAM_0");
-  const [arguments] = extractChainedBlocksForCodeShownToUser(optionBlock);
-  const optionString = arguments.join(" ");
+  const [args] = extractChainedBlocksForCodeShownToUser(optionBlock);
+  const optionString = args.join(" ");
   return `grep ${pattern} ${optionString} `;
 };
 
@@ -74,8 +74,23 @@ jsonGenerator.symbol_less_than = function () {
   return `<`;
 };
 
+function removeEventualQuotes(value) {
+  if (
+    (value.length >= 2 && value.startsWith("'") && value.endsWith("'")) ||
+    (value.startsWith('"') && value.endsWith('"'))
+  ) {
+    return value.slice(1, -1);
+  } else {
+    return value;
+  }
+}
+
+function getFieldValue(block, fieldname, isForLibrary) {
+  const value = block.getFieldValue(fieldname).trim();
+  return isForLibrary ? removeEventualQuotes(value) : value;
+}
 function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
-  const arguments = [];
+  const args = [];
   let current = chainedBlock;
 
   while (current) {
@@ -86,42 +101,35 @@ function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
         current.type.includes("field_index") ||
         current.type.includes("delimiter")
       ) {
-        let value = current.getFieldValue("PARAM_1").trim();
+        const value = getFieldValue(current, "PARAM_1", isForLibrary);
 
-        if (isForLibrary && value === "") {
-          arguments.push(flag);
-        } else if (
-          isForLibrary &&
-          ((value.startsWith("'") && value.endsWith("'")) ||
-            (value.startsWith('"') && value.endsWith('"')))
-        ) {
-          arguments.push(flag);
-          arguments.push(value.slice(1, -1));
+        if (value !== "") {
+          args.push(flag);
+          args.push(value);
         } else {
-          arguments.push(flag);
-          arguments.push(value);
+          args.push(flag);
         }
-      } else {
-        arguments.push(flag);
       }
-    } else if (current.type === "filename") {
-      const filename = current.getFieldValue("PARAM_1");
-      arguments.push(filename);
-    } else if (current.type === "text_input") {
-      const text = current.getFieldValue("PARAM_1");
-      arguments.push(text);
+      // If it's an option without input
+      else {
+        args.push(flag);
+      }
+    }
+    // For the block text and the pattern in grep
+    else if (current.type === "text_input" || current.type === "grep") {
+      const text = getFieldValue(current, "PARAM_1", isForLibrary);
+      args.push(text);
     } else if (current.type === "symbol_greater_than") {
-      arguments.push(jsonGenerator.symbol_greater_than());
+      args.push(jsonGenerator.symbol_greater_than());
     } else if (current.type === "symbol_less_than") {
-      arguments.push(jsonGenerator.symbol_less_than());
+      args.push(jsonGenerator.symbol_less_than());
     } else if (current.type === "symbol_even_greater_than") {
-      arguments.push(jsonGenerator.symbol_even_greater_than());
+      args.push(jsonGenerator.symbol_even_greater_than());
     }
 
     current = current.getInputTargetBlock("PARAM_0");
   }
-
-  return [arguments];
+  return [args];
 }
 
 function extractChainedBlocksForCodeShownToUser(chainedBlock) {

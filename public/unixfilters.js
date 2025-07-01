@@ -13,7 +13,7 @@ UnixFilters.reset = function (taskInfos) {
 UnixFilters.resetDisplay = function (context) {
   $("#grid").html(
     "<button id='backToBeginning'>Reset</button>" +
-      "<button id='launchCommand'>Exécuter</button>" +
+      "<button id='executeCommand'>Exécuter</button>" +
       "<button id='step-by-step'>Step by step</button>" +
       "<button id='goToEnd'>End</button>" +
       "<h3> Code généré</h3>" +
@@ -24,12 +24,11 @@ UnixFilters.resetDisplay = function (context) {
       "<pre id='output'></pre>" +
       "<pre id='commandInput'></pre>"
   );
-
   $("#backToBeginning").on("click", UnixFilters.backToBeginning);
   $("#play").on("click", UnixFilters.play);
   $("#step-by-step").on("click", UnixFilters.nextStep);
   $("#goToEnd").on("click", UnixFilters.end);
-  $("#launchCommand").on("click", function () {
+  $("#executeCommand").on("click", function () {
     UnixFilters.fillEmptyOptionInputs(context);
     UnixFilters.sendCommandToServer();
   });
@@ -41,7 +40,6 @@ UnixFilters.onChange = function (context) {
     .find(function (block) {
       return block.type === "robot_start";
     });
-
   const generatedCode = jsonGenerator.blockToCode(programBlock, false);
   $("#generatedCode").text(
     Array.isArray(generatedCode) ? generatedCode[0] : generatedCode
@@ -52,27 +50,14 @@ UnixFilters.onChange = function (context) {
   );
 };
 
-function getNoopTypeFromBlockType(blockType) {
-  if (blockType.endsWith("_flag")) {
-    return "noop_option_flag";
-  } else if (blockType.endsWith("_field_index")) {
-    return "noop_option_field_index";
-  } else if (blockType.startsWith("text")) {
-    return "noop_text";
-  }
-  return "noop_command";
-}
-
 UnixFilters.fillEmptyOptionInputs = function (context) {
   const allBlocks = context.blocklyHelper.workspace.getAllBlocks(false);
-
   for (const block of allBlocks) {
     const input = block.getInput("PARAM_0");
     if (!input) continue;
 
     if (!input.connection.isConnected()) {
       let expectedType = null;
-      console.log("block type", block.type);
       expectedType = getNoopTypeFromBlockType(block.type);
 
       const dummyBlock = context.blocklyHelper.workspace.newBlock(expectedType);
@@ -104,7 +89,6 @@ UnixFilters.sendCommandToServer = async function () {
       },
       body: JSON.stringify({ commands: pythonCode }),
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Error response:", errorData);
@@ -114,11 +98,12 @@ UnixFilters.sendCommandToServer = async function () {
         `Error sending the request to the server: ${errorData.error}`
       );
     }
-
     const jsonData = await response.json();
     console.log("JSON DATA", jsonData);
-    UnixFilters.parseJson(jsonData);
-    UnixFilters.showStep(UnixFilters.lastIndex);
+    $("#output").text(jsonData);
+
+    // UnixFilters.parseJson(jsonData);
+    // UnixFilters.showStep(UnixFilters.lastIndex);
   } catch (error) {
     console.error("Error when sending command:", error);
   }
@@ -171,3 +156,14 @@ UnixFilters.showStep = function (index) {
     $("#output").text(step.stderr);
   }
 };
+
+function getNoopTypeFromBlockType(blockType) {
+  if (blockType.endsWith("_flag")) {
+    return "noop_option_flag";
+  } else if (blockType.endsWith("_field_index")) {
+    return "noop_option_field_index";
+  } else if (blockType.startsWith("text")) {
+    return "noop_text";
+  }
+  return "noop_command";
+}

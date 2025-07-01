@@ -209,7 +209,7 @@ var getContext = function (display, infos, curLevel) {
       args0: [
         {
           type: "field_input",
-          name: "PATTERN",
+          name: "PARAM_1",
           text: "pattern",
         },
         {
@@ -226,13 +226,12 @@ var getContext = function (display, infos, curLevel) {
     };
 
     var generateCode = function (block) {
-      var pattern = this.getFieldValue("PATTERN");
+      var pattern = this.getFieldValue("PARAM_1");
+      sanitizedPattern = removeEventualQuotes(pattern);
       const paramBlock = block.getInputTargetBlock("PARAM_0");
       const [arguments] = extractChainedBlocksForCodeSentToLib(paramBlock);
-      arguments.unshift(pattern);
-      let string = "";
-      string = "grep(" + JSON.stringify(arguments) + ");";
-      return string;
+      arguments.unshift(sanitizedPattern);
+      return "grep(" + JSON.stringify(arguments) + ")\n";
     };
 
     return {
@@ -254,7 +253,7 @@ var getContext = function (display, infos, curLevel) {
     const [arguments] = extractChainedBlocksForCodeSentToLib(
       paramBlock || null
     );
-    return `${commandName}(${JSON.stringify(arguments)});`;
+    return `${commandName}(${JSON.stringify(arguments)})\n`;
   }
 
   // Creates blocks for options based on their type (flag or field index)
@@ -414,21 +413,6 @@ var getContext = function (display, infos, curLevel) {
     unixfilters: {
       // Categories are reflected in the Blockly menu
       actions: [
-        // {
-        //   name: "filename",
-        //   blocklyJson: {
-        //     colour: 165,
-        //     args0: [
-        //       {
-        //         type: "field_input",
-        //         name: "PARAM_1",
-        //         text: "fruits.txt",
-        //       },
-        //     ],
-        //     output: "null",
-        //   },
-        // },
-
         {
           name: "text_input",
           blocklyJson: {
