@@ -104,6 +104,7 @@ var getContext = function (display, infos, curLevel) {
     }
   };
 
+  // When the mouse enters the workspace or toolbox, remove all no-op blocks that were generated
   if (context.display) {
     const wsContainer = document.querySelector("#blocklyLibContent");
     if (wsContainer) {

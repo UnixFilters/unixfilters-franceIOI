@@ -24,6 +24,8 @@ UnixFilters.resetDisplay = function (context) {
       "<pre id='output'></pre>" +
       "<pre id='commandInput'></pre>"
   );
+
+  // Add event listeners to buttons and link them to their functions
   $("#backToBeginning").on("click", UnixFilters.backToBeginning);
   $("#play").on("click", UnixFilters.play);
   $("#step-by-step").on("click", UnixFilters.nextStep);
@@ -34,7 +36,9 @@ UnixFilters.resetDisplay = function (context) {
   });
 };
 
+// Every time there is a change in the interface
 UnixFilters.onChange = function (context) {
+  // Generates code from blocks for blocks attached to the block "Ligne de commande"
   var programBlock = context.blocklyHelper.workspace
     .getTopBlocks(true)
     .find(function (block) {
@@ -44,12 +48,14 @@ UnixFilters.onChange = function (context) {
   $("#generatedCode").text(
     Array.isArray(generatedCode) ? generatedCode[0] : generatedCode
   );
+  // Log the generated code in the console (debugging)
   console.log(
     "python code generated",
     task.displayedSubTask.blocklyHelper.getCode("python", null, true)
   );
 };
 
+// Fills empty input fields with no-op blocks
 UnixFilters.fillEmptyOptionInputs = function (context) {
   const allBlocks = context.blocklyHelper.workspace.getAllBlocks(false);
   for (const block of allBlocks) {
@@ -68,6 +74,7 @@ UnixFilters.fillEmptyOptionInputs = function (context) {
   }
 };
 
+// Removes no-op blocks
 UnixFilters.removeNoops = function (context) {
   context.blocklyHelper.workspace.getAllBlocks().forEach(function (block) {
     if (block.type.startsWith("noop")) {
@@ -109,6 +116,7 @@ UnixFilters.sendCommandToServer = async function () {
   }
 };
 
+// Parses the JSON data returned and prepares the steps
 UnixFilters.parseJson = function (jsonData) {
   UnixFilters.stepData = Object.values(jsonData.steps);
   UnixFilters.currentIndex = 0;
@@ -157,6 +165,7 @@ UnixFilters.showStep = function (index) {
   }
 };
 
+// Utility function to determine the type of no-op block to create based on the block type
 function getNoopTypeFromBlockType(blockType) {
   if (blockType.endsWith("_flag")) {
     return "noop_option_flag";

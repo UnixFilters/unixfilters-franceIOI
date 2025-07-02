@@ -52,11 +52,6 @@ jsonGenerator.grep = function (block) {
   return `grep ${pattern} ${optionString} `;
 };
 
-jsonGenerator.filename = function (block) {
-  const filename = block.getFieldValue("PARAM_1");
-  return `${filename}`;
-};
-
 jsonGenerator.text_input = function (block) {
   const text = block.getFieldValue("PARAM_1");
   return `${text}`;
@@ -89,6 +84,7 @@ function getFieldValue(block, fieldname, isForLibrary) {
   const value = block.getFieldValue(fieldname).trim();
   return isForLibrary ? removeEventualQuotes(value) : value;
 }
+
 function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
   const args = [];
   let current = chainedBlock;
@@ -145,9 +141,7 @@ jsonGenerator.robot_start = function (block) {
   let child = block.getNextBlock();
   while (child) {
     const snippet = jsonGenerator.blockToCode(child, false);
-    // if the block name doesn't start with 'option' it's a command
-    // not true anymore bc there are new blocks
-    // todo: improve the way it's checked
+    // Only command blocks can be connecter horizontally
     const currentBlockIsCommand = !child.type.startsWith("option_");
     let prev =
       child.previousConnection && child.previousConnection.targetBlock?.();
