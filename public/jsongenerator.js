@@ -23,94 +23,125 @@ jsonGenerator.robot_start = function (block) {
   return "";
 };
 
-// test avec les séquentiels
-jsonGenerator.cat = function (block) {
-  const param = block.getInputTargetBlock("PARAM_0");
-  const [options, filename] = extractChainedBlocks(param);
-  const optionString = options.join(" ");
-
-  return `cat ${optionString} ${filename} `;
-};
-
-jsonGenerator.sort = function (block) {
-  const param = block.getInputTargetBlock("PARAM_0");
-  const [options, filename] = extractChainedBlocks(param);
-  const optionString = options.join(" ");
-  return `sort ${optionString} ${filename} `;
-};
-
-jsonGenerator.filename = function (block) {
-  const filename = block.getFieldValue("PARAM_0");
-  return `${filename}`;
-};
-
-jsonGenerator.grep = function (block) {
-  const pattern = block.getFieldValue("PARAM_0");
-  const optionBlock = block.getInputTargetBlock("PARAM_OPTION");
-  const [options, filename] = extractChainedBlocks(optionBlock);
-  const optionString = options.join(" ");
-  return `grep ${pattern} ${optionString} ${filename} `;
-};
-
-function extractChainedBlocks(chainedBlock) {
-  const arguments = [];
-  let filename = "";
-  let current = chainedBlock;
-  while (current) {
-    if (current.type.startsWith("option_")) {
-      const flag = "-" + current.type.substring(7);
-      if (current.type == "option_k") {
-        const index = current.getFieldValue("COLUMN_INDEX");
-        arguments.push(flag + index);
-      } else {
-        arguments.push(flag);
-      }
-    } else {
-      const arg = current.getFieldValue("PARAM_0");
-      filename = arg;
-    }
-    current = current.getInputTargetBlock("PARAM_0");
-  }
-  return [arguments, filename];
+function makeCommandGenerator(commandName) {
+  return function (block) {
+    const paramBloc = block.getInputTargetBlock("PARAM_0") || null;
+    const [args] = extractChainedBlocksForCodeShownToUser(paramBloc);
+    const parts = [commandName, ...args];
+    return parts.join(" ") + " ";
+  };
 }
 
-jsonGenerator.option_i = function () {
-  return "-i";
+// Generates code for commands
+jsonGenerator.cat = makeCommandGenerator("cat");
+jsonGenerator.sort = makeCommandGenerator("sort");
+jsonGenerator.head = makeCommandGenerator("head");
+jsonGenerator.cut = makeCommandGenerator("cut");
+jsonGenerator.tail = makeCommandGenerator("tail");
+jsonGenerator.tee = makeCommandGenerator("tee");
+jsonGenerator.tr = makeCommandGenerator("tr");
+jsonGenerator.uniq = makeCommandGenerator("uniq");
+jsonGenerator.wc = makeCommandGenerator("wc");
+jsonGenerator.sed = makeCommandGenerator("sed");
+
+jsonGenerator.grep = function (block) {
+  const pattern = block.getFieldValue("PARAM_1");
+  const optionBlock = block.getInputTargetBlock("PARAM_0");
+  const [args] = extractChainedBlocksForCodeShownToUser(optionBlock);
+  const optionString = args.join(" ");
+  return `grep ${pattern} ${optionString} `;
 };
 
-jsonGenerator.option_v = function () {
-  return "-v";
+jsonGenerator.text_input = function (block) {
+  const text = block.getFieldValue("PARAM_1");
+  return `${text}`;
 };
 
-jsonGenerator.option_n = function () {
-  return "-n";
+jsonGenerator.symbol_greater_than = function () {
+  return `>`;
 };
 
-jsonGenerator.option_c = function () {
-  return "-c";
+jsonGenerator.symbol_even_greater_than = function () {
+  return `>>`;
 };
 
-jsonGenerator.option_r = function () {
-  return "-r";
+jsonGenerator.symbol_less_than = function () {
+  return `<`;
 };
 
-jsonGenerator.option_u = function () {
-  return "-u";
-};
+function removeEventualQuotes(value) {
+  if (
+    (value.length >= 2 && value.startsWith("'") && value.endsWith("'")) ||
+    (value.startsWith('"') && value.endsWith('"'))
+  ) {
+    return value.slice(1, -1);
+  } else {
+    return value;
+  }
+}
 
-jsonGenerator.option_k = function (block) {
-  const columnIndex = block.getFieldValue("PARAM_0");
-  console.log("column index", columnIndex);
-  return `-k${columnIndex}`;
-};
+function getFieldValue(block, fieldname, isForLibrary) {
+  const value = block.getFieldValue(fieldname).trim();
+  return isForLibrary ? removeEventualQuotes(value) : value;
+}
+
+function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
+  const args = [];
+  let current = chainedBlock;
+
+  while (current) {
+    if (current.type.startsWith("option_")) {
+      const flag = "-" + current.type.substring(7, 8);
+
+      if (
+        current.type.includes("field_index") ||
+        current.type.includes("delimiter")
+      ) {
+        const value = getFieldValue(current, "PARAM_1", isForLibrary);
+
+        if (value !== "") {
+          args.push(flag);
+          args.push(value);
+        } else {
+          args.push(flag);
+        }
+      }
+      // If it's an option without input
+      else {
+        args.push(flag);
+      }
+    }
+    // For the block text and the pattern in grep
+    else if (current.type === "text_input" || current.type === "grep") {
+      const text = getFieldValue(current, "PARAM_1", isForLibrary);
+      args.push(text);
+    } else if (current.type === "symbol_greater_than") {
+      args.push(jsonGenerator.symbol_greater_than());
+    } else if (current.type === "symbol_less_than") {
+      args.push(jsonGenerator.symbol_less_than());
+    } else if (current.type === "symbol_even_greater_than") {
+      args.push(jsonGenerator.symbol_even_greater_than());
+    }
+
+    current = current.getInputTargetBlock("PARAM_0");
+  }
+  return [args];
+}
+
+function extractChainedBlocksForCodeShownToUser(chainedBlock) {
+  return extractChainedBlocksForCode(chainedBlock, false);
+}
+
+function extractChainedBlocksForCodeSentToLib(chainedBlock) {
+  return extractChainedBlocksForCode(chainedBlock, true);
+}
 
 jsonGenerator.robot_start = function (block) {
   let code = "";
   let child = block.getNextBlock();
   while (child) {
     const snippet = jsonGenerator.blockToCode(child, false);
-    // if the block name doesn't start with 'option' it's a command
-    // todo: improve the way it's checked
+    // Only command blocks can be connecter horizontally
     const currentBlockIsCommand = !child.type.startsWith("option_");
     let prev =
       child.previousConnection && child.previousConnection.targetBlock?.();
