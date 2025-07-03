@@ -20,7 +20,6 @@ def save_solution():
             f.write(python_code)
 
         path_commands = os.path.join(PATH_GEN, "commands.py")
-        print("path commands", path_commands)
         path_input = os.path.join(PATH_FILES, "test01.in")
         path_solout = os.path.join(PATH_FILES, "test01.solout")
 
@@ -44,14 +43,20 @@ def save_solution():
             check=True,
         )
 
-        output_lines = result.stdout.strip().splitlines()
+        checker_output = result.stdout.strip()
+        print(checker_output)
+        try:
+            parsed_output = json.loads(checker_output)
+        except json.JSONDecodeError:
+            return jsonify({"error": "checker.py didn't send a valid JSON"}), 500
+        score = parsed_output.get("score", 0)
+        message = parsed_output.get("message", "Aucun message")
+        steps = parsed_output.get("steps", {})
+        print(
+            "RETURNING", jsonify({"score": score, "message": message, "steps": steps})
+        )
+        return jsonify({"score": score, "message": message, "steps": steps})
 
-        score = output_lines[0]
-        message = output_lines[1]
-        json_str = "\n".join(output_lines[2:])
-        steps = json.loads(json_str)
-        print("STEPS", steps)
-        return jsonify({"score": score, "feedback": message, "steps": steps})
     except subprocess.CalledProcessError as error:
         return (
             jsonify(

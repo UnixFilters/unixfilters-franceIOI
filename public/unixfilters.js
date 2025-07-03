@@ -13,7 +13,7 @@ UnixFilters.reset = function (taskInfos) {
 UnixFilters.resetDisplay = function (context) {
   $("#grid").html(
     "<pre id='score'></pre>" +
-      "<pre id='feedback'></pre>" +
+      "<pre id='message'></pre>" +
       "<button id='backToBeginning'>Reset</button>" +
       "<button id='executeCommand'>Exécuter</button>" +
       "<button id='step-by-step'>Step by step</button>" +
@@ -109,12 +109,11 @@ UnixFilters.sendCommandToServer = async function () {
     }
 
     const jsonData = await response.json();
-    jsonData.steps = JSON.parse(jsonData.steps);
 
     console.log("JSON DATA STEPS", jsonData.steps);
 
     updateScore(jsonData.score);
-    $("#feedback").text(jsonData.feedback);
+    $("#message").text(jsonData.message);
 
     UnixFilters.parseJson(jsonData.steps);
     UnixFilters.showStep(UnixFilters.lastIndex);
