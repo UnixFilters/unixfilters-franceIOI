@@ -153,17 +153,57 @@ var getContext = function (display, infos, curLevel) {
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
    */
 
-  const COMMAND_NAMES = [
-    "cat",
-    "sort",
-    "head",
-    "cut",
-    "tail",
-    "tee",
-    "tr",
-    "uniq",
-    "wc",
-    "sed",
+  const COMMANDS = [
+    {
+      commandName: "cat",
+      tooltip: "Concatène et affiche le contenu d'un fichier",
+      format: "cat [options] fichier",
+    },
+    {
+      commandName: "sort",
+      tooltip: "Trie les lignes d'un fichier",
+      format: "sort [options] fichier",
+    },
+    {
+      commandName: "head",
+      tooltip: "Affiche les premières lignes d'un fichier",
+      format: "head [options] fichier",
+    },
+    {
+      commandName: "cut",
+      tooltip: "Extrait des colonnes spécifiques",
+      format: "cut [options] fichier",
+    },
+    {
+      commandName: "tail",
+      tooltip: "Affiche les dernières lignes d'un fichier",
+      format: "tail [options] fichier",
+    },
+    {
+      commandName: "tee",
+      tooltip: "Duplique la sortie vers un fichier et la console",
+      format: "tee [options] fichier",
+    },
+    {
+      commandName: "tr",
+      tooltip: "Remplace ou supprime des caractères",
+      format: "tr [options]",
+    },
+    {
+      commandName: "uniq",
+      tooltip: "Supprime les lignes dupliquées adjacentes",
+      format: "uniq [options] fichier",
+    },
+    {
+      commandName: "wc",
+      tooltip: "Compte lignes, mots et caractères",
+      format: "wc [options] fichier",
+    },
+    {
+      commandName: "sed",
+      tooltip: "Editeur de flux pour transformer du texte",
+      format: "sed [options] script fichier",
+    },
   ];
 
   // Array defining available options for flags and field indices
@@ -207,6 +247,8 @@ var getContext = function (display, infos, curLevel) {
       name: "grep",
       category: "actions",
       colour: 285,
+      tooltip:
+        "Permet de rechercher un motif dans un fichier.\ngrep pattern [options] [FICHIER] ",
       args0: [
         {
           type: "field_input",
@@ -359,10 +401,11 @@ var getContext = function (display, infos, curLevel) {
   }
 
   // Creates a block for a given command name
-  function makeUnixFilterBlock(commandName) {
+  function makeUnixFilterBlock(command) {
     return {
-      name: commandName,
+      name: command.commandName,
       blocklyJson: {
+        tooltip: command.tooltip + "\n" + command.format,
         colour: 285,
         args0: [
           {
@@ -372,9 +415,10 @@ var getContext = function (display, infos, curLevel) {
         ],
       },
       codeGenerators: {
-        Python: (block) => generateCodeForCommand(commandName, block, "Python"),
+        Python: (block) =>
+          generateCodeForCommand(command.commandName, block, "Python"),
         JavaScript: (block) =>
-          generateCodeForCommand(commandName, block, "JavaScript"),
+          generateCodeForCommand(command.commandName, block, "JavaScript"),
       },
     };
   }
@@ -481,7 +525,7 @@ var getContext = function (display, infos, curLevel) {
   });
 
   // Creates a block for each command in array
-  COMMAND_NAMES.forEach((command) => {
+  COMMANDS.forEach((command) => {
     context.customBlocks.unixfilters.actions.push(makeUnixFilterBlock(command));
   });
 
