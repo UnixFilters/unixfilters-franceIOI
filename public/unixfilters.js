@@ -110,9 +110,10 @@ UnixFilters.sendCommandToServer = async function () {
 
     const jsonData = await response.json();
     jsonData.steps = JSON.parse(jsonData.steps);
+
     console.log("JSON DATA STEPS", jsonData.steps);
-    console.log("score :", jsonData.score);
-    $("#score").text("Score : " + jsonData.score);
+
+    updateScore(jsonData.score);
     $("#feedback").text(jsonData.feedback);
 
     UnixFilters.parseJson(jsonData.steps);
@@ -121,6 +122,17 @@ UnixFilters.sendCommandToServer = async function () {
     console.error("Error when sending command:", error);
   }
 };
+
+function updateScore(score) {
+  if (score === "100") {
+    document.getElementById("score").style.color = "green";
+  } else if (score === "90") {
+    document.getElementById("score").style.color = "orange";
+  } else {
+    document.getElementById("score").style.color = "red";
+  }
+  $("#score").text("Score : " + score);
+}
 
 // Parses the JSON data returned and prepares the steps
 UnixFilters.parseJson = function (jsonData) {
