@@ -409,11 +409,47 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
+  var toolbox = {
+    kind: "categoryToolbox",
+    contents: [
+      {
+        kind: "category",
+        name: "Control",
+        contents: [
+          {
+            kind: "block",
+            type: "controls_if",
+          },
+        ],
+      },
+      {
+        kind: "category",
+        name: "Logic",
+        contents: [
+          {
+            kind: "block",
+            type: "logic_compare",
+          },
+          {
+            kind: "block",
+            type: "logic_operation",
+          },
+          {
+            kind: "block",
+            type: "logic_boolean",
+          },
+        ],
+      },
+    ],
+  };
+  console.log("toolbox", toolbox);
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
       // Categories are reflected in the Blockly menu
+      toolbox,
       actions: [
+        toolbox,
         {
           name: "text_input",
           blocklyJson: {
