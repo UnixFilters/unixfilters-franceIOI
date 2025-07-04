@@ -374,6 +374,7 @@ var getContext = function (display, infos, curLevel) {
     return {
       name: command.commandName,
       blocklyJson: {
+        tooltip: command.tooltip + "\n" + command.format,
         colour: 285,
         args0: [
           {
