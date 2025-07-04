@@ -346,6 +346,16 @@ var getContext = function (display, infos, curLevel) {
 
   // Creates a field index option block for a given flag
   function makeFieldIndexBlock(flag) {
+    const blockName = "option_" + flag + "_field_index";
+    const compatibleCommands = Object.entries(optionTooltips)
+      .filter(([_, flags]) => flags[flag])
+      .map(([command]) => command);
+
+    const initialTooltip =
+      compatibleCommands.length > 0
+        ? `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
+        : `Option -${flag}`;
+
     context.customBlocks.unixfilters.actions.push({
       name: "option_" + flag + "_field_index",
       blocklyJson: {
@@ -365,8 +375,10 @@ var getContext = function (display, infos, curLevel) {
           },
         ],
         output: "null",
+        tooltip: initialTooltip,
       },
     });
+
     context.unixfilters["option_" + flag + "_field_index"] = function () {
       UnixFilters.currentOptions.push("-" + flag + "_field_index");
     };
@@ -405,7 +417,6 @@ var getContext = function (display, infos, curLevel) {
     return {
       name: command.commandName,
       blocklyJson: {
-        tooltip: command.tooltip + "\n" + command.format,
         colour: 285,
         args0: [
           {
@@ -452,48 +463,11 @@ var getContext = function (display, infos, curLevel) {
       },
     };
   }
-
-  var toolbox = {
-    kind: "categoryToolbox",
-    contents: [
-      {
-        kind: "category",
-        name: "Control",
-        contents: [
-          {
-            kind: "block",
-            type: "controls_if",
-          },
-        ],
-      },
-      {
-        kind: "category",
-        name: "Logic",
-        contents: [
-          {
-            kind: "block",
-            type: "logic_compare",
-          },
-          {
-            kind: "block",
-            type: "logic_operation",
-          },
-          {
-            kind: "block",
-            type: "logic_boolean",
-          },
-        ],
-      },
-    ],
-  };
-  console.log("toolbox", toolbox);
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
       // Categories are reflected in the Blockly menu
-      toolbox,
       actions: [
-        toolbox,
         {
           name: "text_input",
           blocklyJson: {
