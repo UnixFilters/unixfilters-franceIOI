@@ -38,8 +38,42 @@ UnixFilters.resetDisplay = function (context) {
   });
 };
 
+function refreshOptionTooltip(optionBlock) {
+  const parent = optionBlock.getParent();
+  const type = optionBlock.type;
+  const flag = type.startsWith("option_") ? type[7] : null;
+
+  if (!flag) return;
+
+  if (
+    parent &&
+    optionTooltips[parent.type] &&
+    optionTooltips[parent.type][flag]
+  ) {
+    optionBlock.setTooltip(optionTooltips[parent.type][flag]);
+  } else {
+    const compatibleCommands = Object.entries(optionTooltips)
+      .filter(([command, flags]) => flags[flag])
+      .map(([command]) => command);
+    if (compatibleCommands.length > 0) {
+      optionBlock.setTooltip(
+        `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
+      );
+    } else {
+      optionBlock.setTooltip("Option -" + flag);
+    }
+  }
+}
+
 // Every time there is a change in the interface
 UnixFilters.onChange = function (context) {
+  const allBlocks = context.blocklyHelper.workspace.getAllBlocks();
+  for (const block of allBlocks) {
+    if (block.type.startsWith("option_")) {
+      refreshOptionTooltip(block);
+    }
+  }
+
   // Generates code from blocks for blocks attached to the block "Ligne de commande"
   var programBlock = context.blocklyHelper.workspace
     .getTopBlocks(true)
