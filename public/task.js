@@ -5,43 +5,13 @@ function initTask(subTask) {
     actionDelay: 200,
     includeBlocks: {
       generatedBlocks: {
-        unixfilters: [
-          "cat",
-          "grep",
-          "symbol_greater_than",
-          "symbol_even_greater_than",
-          "symbol_less_than",
-          "text_input",
-          "sort",
-          "head",
-          "cut",
-          "tail",
-          "tee",
-          "tr",
-          "uniq",
-          "wc",
-          "sed",
-          "option_i_flag",
-          "option_v_flag",
-          "option_i_flag",
-          "option_n_flag",
-          "option_c_flag",
-          "option_r_flag",
-          "option_u_flag",
-          "option_n_field_index",
-          "option_k_field_index",
-          "option_c_field_index",
-          "option_d_field_index",
-          "option_t_field_index",
-          "option_f_field_index",
-          "option_b_field_index",
-          "option_a_flag",
-          "option_d_flag",
-          "option_l_flag",
-          "option_w_flag",
-          "option_m_flag",
-          // "option_e_flag",
-        ],
+        unixfilters: {
+          commands: true,
+          options: true,
+          symbols: true,
+          noop: true,
+          inputs: true,
+        },
       },
       singleBlocks: ["text"],
     },
@@ -67,7 +37,7 @@ function initTask(subTask) {
   subTask.data = {
     easy: [""],
   };
-
+  console.log(subTask);
   initBlocklySubTask(subTask);
 }
 
