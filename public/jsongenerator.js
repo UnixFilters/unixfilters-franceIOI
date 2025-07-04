@@ -85,36 +85,6 @@ function getFieldValue(block, fieldname, isForLibrary) {
   return isForLibrary ? removeEventualQuotes(value) : value;
 }
 
-const optionTooltips = {
-  cut: {
-    f: "Option -f pour cut : numéro de champ",
-    b: "Option -b pour cut : byte",
-    c: "Option -c pour cut : caractère",
-  },
-  head: {
-    n: "Option -n pour head : nombre de ligne affiché",
-    c: "Option -c pour head : nombre de bytes",
-  },
-};
-
-// function updateToolTips(parentBlock, optionBlock, flag) {
-//   // const commandType = commandBlock.type;
-//   console.log("parentBlock", parentBlock.type);
-//   console.log("optionTooltips[parentBlock]", optionTooltips[parentBlock.type]);
-//   console.log(
-//     "optionTooltips[parentBlock][flag]",
-//     optionTooltips[parentBlock.type][flag]
-//   );
-//   if (
-//     optionTooltips[parentBlock.type] &&
-//     optionTooltips[parentBlock.type][flag]
-//   ) {
-//     optionBlock.setTooltip(optionTooltips[parentBlock.type][flag]);
-//   } else {
-//     optionBlock.setTooltip(`Option -${flag}`);
-//   }
-// }
-
 function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
   const args = [];
   let current = chainedBlock;

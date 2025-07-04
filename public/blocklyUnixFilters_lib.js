@@ -215,15 +215,15 @@ var getContext = function (display, infos, curLevel) {
     { flag: "r", type: "flag" },
     { flag: "u", type: "flag" },
     { flag: "k", type: "field_index" },
-    { flag: "d", type: ["flag", "delimiter"] },
-    { flag: "t", type: "delimiter" },
+    { flag: "d", type: ["flag", "field_index"] },
+    { flag: "t", type: "field_index" },
     { flag: "f", type: "field_index" },
+    { flag: "b", type: "field_index" },
     { flag: "a", type: "flag" },
     { flag: "s", type: "flag" },
     { flag: "w", type: "flag" },
     { flag: "l", type: "flag" },
     { flag: "m", type: "flag" },
-    { flag: "e", type: "flag" },
   ];
 
   // Array defining symbol name and colour
@@ -299,120 +299,77 @@ var getContext = function (display, infos, curLevel) {
     return `${commandName}(${JSON.stringify(arguments)})\n`;
   }
 
-  // Creates blocks for options based on their type (flag or field index)
-  function makeOptionBlock(optionObject) {
-    if (Array.isArray(optionObject.type)) {
-      optionObject.type.forEach((type) => {
-        if (type === "field_index") {
-          makeFieldIndexBlock(optionObject.flag);
-        } else if (type === "flag") {
-          makeFlagBlock(optionObject.flag);
-        } else if (type == "delimiter") {
-          makeDelimiterBlock(optionObject.flag);
-        }
-      });
-    } else {
-      if (optionObject.type === "field_index") {
-        makeFieldIndexBlock(optionObject.flag);
-      } else if (optionObject.type === "flag") {
-        makeFlagBlock(optionObject.flag);
-      } else if (optionObject.type == "delimiter") {
-        makeDelimiterBlock(optionObject.flag);
-      }
-    }
-  }
+  // Creates an option block based on its type (flag or field_index)
+  function makeOptionBlock(flag, type = "flag") {
+    const blockName = `option_${flag}_${type}`;
 
-  // Creates a flag option block for a given flag
-  function makeFlagBlock(flag) {
-    context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_flag",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1`,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-        colour: 225,
-        output: "null",
-      },
-    });
-    context.unixfilters["option_" + flag + "_flag"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_flag");
-    };
-  }
-
-  // Creates a field index option block for a given flag
-  function makeFieldIndexBlock(flag) {
-    const blockName = "option_" + flag + "_field_index";
+    // Get the list of commands compatible with this flag and type
     const compatibleCommands = Object.entries(optionTooltips)
-      .filter(([_, flags]) => flags[flag])
+      .filter(([_, flags]) => flags[flag] && flags[flag][type])
       .map(([command]) => command);
 
-    const initialTooltip =
+    // Base tooltip containing compatible commands or fallback
+    const baseTooltip =
       compatibleCommands.length > 0
         ? `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
         : `Option -${flag}`;
 
+    // Basic option block structure
+    let blocklyJson = {
+      name: `-${flag}`,
+      output: "null",
+      tooltip: baseTooltip,
+    };
+
+    // COnfigure block layout based on the option type
+    switch (type) {
+      case "flag":
+        blocklyJson = {
+          ...blocklyJson,
+          message0: `-${flag} %1`,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          colour: 225,
+        };
+        break;
+
+      case "field_index":
+        blocklyJson = {
+          ...blocklyJson,
+          message0: `-${flag} %1 %2`,
+          args0: [
+            {
+              type: "field_input",
+              name: "PARAM_1",
+              text: "",
+            },
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          colour: 200,
+        };
+        break;
+
+      default:
+        throw new Error(`Type d'option inconnu : ${type}`);
+    }
     context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_field_index",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1 %2`,
-        colour: 200,
-        args0: [
-          {
-            type: "field_input",
-            name: "PARAM_1",
-            text: "",
-          },
-          {
-            type: "input_value",
-            name: "PARAM_0",
-            text: "",
-          },
-        ],
-        output: "null",
-        tooltip: initialTooltip,
-      },
+      name: blockName,
+      blocklyJson,
     });
 
-    context.unixfilters["option_" + flag + "_field_index"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_field_index");
+    context.unixfilters[blockName] = function () {
+      UnixFilters.currentOptions.push(blockName);
     };
   }
 
-  // Creates a delimiter option block for a given flag
-  function makeDelimiterBlock(flag) {
-    context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_delimiter",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1 %2`,
-        colour: 200,
-        args0: [
-          {
-            type: "field_input",
-            name: "PARAM_1",
-            text: "",
-          },
-          {
-            type: "input_value",
-            name: "PARAM_0",
-            text: "",
-          },
-        ],
-        output: "null",
-      },
-    });
-    context.unixfilters["option_" + flag + "_field_index"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_field_index");
-    };
-  }
-
-  // Creates a block for a given command name
+  // Creates a block for a Unix command (grep, sort,...)
   function makeUnixFilterBlock(command) {
     return {
       name: command.commandName,
@@ -434,7 +391,7 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
-  // Creates a block for a given command name
+  // Creates a "noop" (no-operation) block (placeholder block with no behavior)
   function makeNoopBlock(noopObject) {
     return {
       name: noopObject.name,
@@ -447,7 +404,7 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
-  // Creates a block for symbol
+  // Creates a symbol block (>,>>,<)
   function makeSymbolBlock(symbolObject) {
     return {
       name: symbolObject.name,
@@ -463,6 +420,7 @@ var getContext = function (display, infos, curLevel) {
       },
     };
   }
+
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
@@ -494,8 +452,12 @@ var getContext = function (display, infos, curLevel) {
   };
 
   // Creates an option block for each option in array
-  OPTIONS.forEach((option) => {
-    makeOptionBlock(option);
+  OPTIONS.forEach(({ flag, type }) => {
+    if (Array.isArray(type)) {
+      type.forEach((t) => makeOptionBlock(flag, t));
+    } else {
+      makeOptionBlock(flag, type);
+    }
   });
 
   // Creates a block for each command in array
