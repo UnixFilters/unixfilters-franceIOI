@@ -4,6 +4,10 @@ var getContext = function (display, infos, curLevel) {
   // Local language strings for each language
   var localLanguageStrings = {
     fr: {
+      categories: {
+        commands: "Commandes",
+        options: "Options",
+      },
       // French strings
       label: {
         // Labels for the blocks
@@ -422,15 +426,45 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
+  // context.customBlocks = {
+  //   // Define our blocks for our namespace "unixfilters"
+  //   unixfilters: {
+  //     // Categories are reflected in the Blockly menu
+  //     commands: [makeGrepBlock()],
+  //     options: [],
+  //     symbols: [],
+  //     noop: [],
+  //     inputs: [],
+  //     actions: [],
+  //   },
+  // };
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
       // Categories are reflected in the Blockly menu
+      actions: [
+        {
+          name: "text_input",
+          blocklyJson: {
+            message0: `%1 %2`,
+            args0: [
+              {
+                type: "field_input",
+                name: "PARAM_1",
+                text: "a-z",
+              },
+              {
+                type: "input_value",
+                name: "PARAM_0",
+              },
+            ],
+            output: null,
+            colour: 165,
+          },
+        },
+      ],
       commands: [makeGrepBlock()],
       options: [],
-      symbols: [],
-      noop: [],
-      inputs: [],
     },
   };
 
@@ -445,45 +479,44 @@ var getContext = function (display, infos, curLevel) {
 
   // Creates a block for each command in array
   COMMANDS.forEach((command) => {
-    context.customBlocks.unixfilters.commands.push(
-      makeUnixFilterBlock(command)
-    );
+    context.customBlocks.unixfilters.actions.push(makeUnixFilterBlock(command));
   });
 
   // Creates a symbol block for each name in array
   SYMBOL_NAMES.forEach((symbol) => {
-    context.customBlocks.unixfilters.symbols.push(makeSymbolBlock(symbol));
+    context.customBlocks.unixfilters.actions.push(makeSymbolBlock(symbol));
   });
 
   // Creates a noop block for each name in array
   NOOP_NAMES.forEach((noop) => {
-    context.customBlocks.unixfilters.noop.push(makeNoopBlock(noop));
+    context.customBlocks.unixfilters.actions.push(makeNoopBlock(noop));
   });
 
-  context.customBlocks.unixfilters.inputs.push({
-    name: "text_input",
-    blocklyJson: {
-      message0: `%1 %2`,
-      args0: [
-        {
-          type: "field_input",
-          name: "PARAM_1",
-          text: "a-z",
-        },
-        {
-          type: "input_value",
-          name: "PARAM_0",
-        },
-      ],
-      output: null,
-      colour: 165,
-    },
-  });
+  // context.customBlocks.unixfilters.actions.push({
+  //   name: "text_input",
+  //   blocklyJson: {
+  //     message0: `%1 %2`,
+  //     args0: [
+  //       {
+  //         type: "field_input",
+  //         name: "PARAM_1",
+  //         text: "a-z",
+  //       },
+  //       {
+  //         type: "input_value",
+  //         name: "PARAM_0",
+  //       },
+  //     ],
+  //     output: null,
+  //     colour: 165,
+  //   },
+  // });
 
   // Color indexes of block categories (as a hue in the range 0–420)
   context.provideBlocklyColours = function () {
     return {
       categories: {
+        actions: 224,
         commands: 285,
         options: 200,
         symbols: 50,
