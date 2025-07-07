@@ -4,14 +4,9 @@ function initTask(subTask) {
     conceptViewer: false,
     actionDelay: 200,
     includeBlocks: {
+      groupByCategory: true,
       generatedBlocks: {
-        unixfilters: {
-          commands: true,
-          options: true,
-          symbols: true,
-          noop: true,
-          inputs: true,
-        },
+        unixfilters: ["cat", "grep", "option_i_flag"],
       },
       singleBlocks: ["text"],
     },
