@@ -278,9 +278,9 @@ var getContext = function (display, infos, curLevel) {
       var pattern = this.getFieldValue("PARAM_1");
       sanitizedPattern = removeEventualQuotes(pattern);
       const paramBlock = block.getInputTargetBlock("PARAM_0");
-      const [arguments] = extractChainedBlocksForCodeSentToLib(paramBlock);
-      arguments.unshift(sanitizedPattern);
-      return "grep(" + JSON.stringify(arguments) + ")\n";
+      const [args] = extractChainedBlocksForCodeSentToLib(paramBlock);
+      args.unshift(sanitizedPattern);
+      return "grep(" + JSON.stringify(args) + ")\n";
     };
 
     return {
@@ -299,10 +299,8 @@ var getContext = function (display, infos, curLevel) {
   function generateCodeForCommand(commandName, block, lang) {
     // lang is not used because we generate the same code for both Python and JavaScript
     const paramBlock = block.getInputTargetBlock("PARAM_0");
-    const [arguments] = extractChainedBlocksForCodeSentToLib(
-      paramBlock || null
-    );
-    return `${commandName}(${JSON.stringify(arguments)})\n`;
+    const [args] = extractChainedBlocksForCodeSentToLib(paramBlock || null);
+    return `${commandName}(${JSON.stringify(args)})\n`;
   }
 
   // Creates an option block based on its type (flag or field_index)
@@ -376,56 +374,62 @@ var getContext = function (display, infos, curLevel) {
   }
 
   // Creates a block for a Unix command (grep, sort,...)
-  function makeUnixFilterBlock(command) {
-    return {
-      name: command.commandName,
-      blocklyJson: {
-        tooltip: command.tooltip + "\n" + command.format,
-        colour: 285,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-      },
-      codeGenerators: {
-        Python: (block) =>
-          generateCodeForCommand(command.commandName, block, "Python"),
-        JavaScript: (block) =>
-          generateCodeForCommand(command.commandName, block, "JavaScript"),
-      },
-    };
+  function makeCommandBlock(commandArray) {
+    commandArray.forEach((command) => {
+      context.customBlocks.unixfilters.commands.push({
+        name: command.commandName,
+        blocklyJson: {
+          tooltip: command.tooltip + "\n" + command.format,
+          colour: 285,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+        },
+        codeGenerators: {
+          Python: (block) =>
+            generateCodeForCommand(command.commandName, block, "Python"),
+          JavaScript: (block) =>
+            generateCodeForCommand(command.commandName, block, "JavaScript"),
+        },
+      });
+    });
   }
 
   // Creates a "noop" (no-operation) block (placeholder block with no behavior)
-  function makeNoopBlock(noopObject) {
-    return {
-      name: noopObject.name,
-      blocklyJson: {
-        colour: noopObject.colour,
-        type: "noop",
-        message0: "",
-        output: "null",
-      },
-    };
+  function makeNoopBlock(noopArray) {
+    noopArray.forEach((noop) => {
+      context.customBlocks.unixfilters.commands.push({
+        name: noop.name,
+        blocklyJson: {
+          colour: noop.colour,
+          type: "noop",
+          message0: "",
+          output: "null",
+        },
+      });
+    });
   }
 
   // Creates a symbol block (>,>>,<)
-  function makeSymbolBlock(symbolObject) {
-    return {
-      name: symbolObject.name,
-      blocklyJson: {
-        colour: symbolObject.colour,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-        output: "null",
-      },
-    };
+  function makeSymbolBlock(symbolArray) {
+    symbolArray.forEach((symbol) => {
+      context.customBlocks.unixfilters.symbols.push({
+        name: symbol.name,
+        blocklyJson: {
+          colour: symbol.colour,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          output: "null",
+        },
+      });
+    });
   }
 
   context.customBlocks = {
@@ -468,22 +472,9 @@ var getContext = function (display, infos, curLevel) {
     }
   });
 
-  // Creates a block for each command in array
-  COMMANDS.forEach((command) => {
-    context.customBlocks.unixfilters.commands.push(
-      makeUnixFilterBlock(command)
-    );
-  });
-
-  // Creates a symbol block for each name in array
-  SYMBOL_NAMES.forEach((symbol) => {
-    context.customBlocks.unixfilters.symbols.push(makeSymbolBlock(symbol));
-  });
-
-  // Creates a noop block for each name in array
-  NOOP_NAMES.forEach((noop) => {
-    context.customBlocks.unixfilters.commands.push(makeNoopBlock(noop));
-  });
+  makeCommandBlock(COMMANDS);
+  makeSymbolBlock(SYMBOL_NAMES);
+  makeNoopBlock(NOOP_NAMES);
 
   // Color indexes of block categories (as a hue in the range 0–420)
   context.provideBlocklyColours = function () {
