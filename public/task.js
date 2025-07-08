@@ -67,7 +67,6 @@ function initTask(subTask) {
   subTask.data = {
     easy: [""],
   };
-  console.log(subTask);
   initBlocklySubTask(subTask);
 }
 
