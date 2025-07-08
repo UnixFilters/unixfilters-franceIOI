@@ -4,6 +4,7 @@ function initTask(subTask) {
     conceptViewer: false,
     actionDelay: 200,
     includeBlocks: {
+      groupByCategory: true,
       generatedBlocks: {
         unixfilters: [
           "cat",
@@ -31,15 +32,15 @@ function initTask(subTask) {
           "option_n_field_index",
           "option_k_field_index",
           "option_c_field_index",
-          "option_d_delimiter",
-          "option_t_delimiter",
+          "option_d_field_index",
+          "option_t_field_index",
           "option_f_field_index",
+          "option_b_field_index",
           "option_a_flag",
           "option_d_flag",
           "option_l_flag",
           "option_w_flag",
           "option_m_flag",
-          "option_e_flag",
         ],
       },
       singleBlocks: ["text"],
@@ -66,7 +67,6 @@ function initTask(subTask) {
   subTask.data = {
     easy: [""],
   };
-
   initBlocklySubTask(subTask);
 }
 

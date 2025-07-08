@@ -4,6 +4,12 @@ var getContext = function (display, infos, curLevel) {
   // Local language strings for each language
   var localLanguageStrings = {
     fr: {
+      categories: {
+        commands: "Commandes",
+        options: "Options",
+        symbols: "Redirections",
+        inputs: "Entrée",
+      },
       // French strings
       label: {
         // Labels for the blocks
@@ -153,17 +159,57 @@ var getContext = function (display, infos, curLevel) {
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
    */
 
-  const COMMAND_NAMES = [
-    "cat",
-    "sort",
-    "head",
-    "cut",
-    "tail",
-    "tee",
-    "tr",
-    "uniq",
-    "wc",
-    "sed",
+  const COMMANDS = [
+    {
+      commandName: "cat",
+      tooltip: "Concatène et affiche le contenu d'un fichier",
+      format: "cat [options] fichier",
+    },
+    {
+      commandName: "sort",
+      tooltip: "Trie les lignes d'un fichier",
+      format: "sort [options] fichier",
+    },
+    {
+      commandName: "head",
+      tooltip: "Affiche les premières lignes d'un fichier",
+      format: "head [options] fichier",
+    },
+    {
+      commandName: "cut",
+      tooltip: "Extrait des colonnes spécifiques",
+      format: "cut [options] fichier",
+    },
+    {
+      commandName: "tail",
+      tooltip: "Affiche les dernières lignes d'un fichier",
+      format: "tail [options] fichier",
+    },
+    {
+      commandName: "tee",
+      tooltip: "Duplique la sortie vers un fichier et la console",
+      format: "tee [options] fichier",
+    },
+    {
+      commandName: "tr",
+      tooltip: "Remplace ou supprime des caractères",
+      format: "tr [options]",
+    },
+    {
+      commandName: "uniq",
+      tooltip: "Supprime les lignes dupliquées adjacentes",
+      format: "uniq [options] fichier",
+    },
+    {
+      commandName: "wc",
+      tooltip: "Compte lignes, mots et caractères",
+      format: "wc [options] fichier",
+    },
+    {
+      commandName: "sed",
+      tooltip: "Editeur de flux pour transformer du texte",
+      format: "sed [options] script fichier",
+    },
   ];
 
   // Array defining available options for flags and field indices
@@ -175,15 +221,15 @@ var getContext = function (display, infos, curLevel) {
     { flag: "r", type: "flag" },
     { flag: "u", type: "flag" },
     { flag: "k", type: "field_index" },
-    { flag: "d", type: ["flag", "delimiter"] },
-    { flag: "t", type: "delimiter" },
+    { flag: "d", type: ["flag", "field_index"] },
+    { flag: "t", type: "field_index" },
     { flag: "f", type: "field_index" },
+    { flag: "b", type: "field_index" },
     { flag: "a", type: "flag" },
     { flag: "s", type: "flag" },
     { flag: "w", type: "flag" },
     { flag: "l", type: "flag" },
     { flag: "m", type: "flag" },
-    { flag: "e", type: "flag" },
   ];
 
   // Array defining symbol name and colour
@@ -205,8 +251,10 @@ var getContext = function (display, infos, curLevel) {
     // Function to make a grep block
     var blockJson = {
       name: "grep",
-      category: "actions",
+      category: "commands",
       colour: 285,
+      tooltip:
+        "Permet de rechercher un motif dans un fichier.\ngrep pattern [options] [FICHIER] ",
       args0: [
         {
           type: "field_input",
@@ -230,9 +278,9 @@ var getContext = function (display, infos, curLevel) {
       var pattern = this.getFieldValue("PARAM_1");
       sanitizedPattern = removeEventualQuotes(pattern);
       const paramBlock = block.getInputTargetBlock("PARAM_0");
-      const [arguments] = extractChainedBlocksForCodeSentToLib(paramBlock);
-      arguments.unshift(sanitizedPattern);
-      return "grep(" + JSON.stringify(arguments) + ")\n";
+      const [args] = extractChainedBlocksForCodeSentToLib(paramBlock);
+      args.unshift(sanitizedPattern);
+      return "grep(" + JSON.stringify(args) + ")\n";
     };
 
     return {
@@ -251,169 +299,144 @@ var getContext = function (display, infos, curLevel) {
   function generateCodeForCommand(commandName, block, lang) {
     // lang is not used because we generate the same code for both Python and JavaScript
     const paramBlock = block.getInputTargetBlock("PARAM_0");
-    const [arguments] = extractChainedBlocksForCodeSentToLib(
-      paramBlock || null
-    );
-    return `${commandName}(${JSON.stringify(arguments)})\n`;
+    const [args] = extractChainedBlocksForCodeSentToLib(paramBlock || null);
+    return `${commandName}(${JSON.stringify(args)})\n`;
   }
 
-  // Creates blocks for options based on their type (flag or field index)
-  function makeOptionBlock(optionObject) {
-    if (Array.isArray(optionObject.type)) {
-      optionObject.type.forEach((type) => {
-        if (type === "field_index") {
-          makeFieldIndexBlock(optionObject.flag);
-        } else if (type === "flag") {
-          makeFlagBlock(optionObject.flag);
-        } else if (type == "delimiter") {
-          makeDelimiterBlock(optionObject.flag);
-        }
-      });
-    } else {
-      if (optionObject.type === "field_index") {
-        makeFieldIndexBlock(optionObject.flag);
-      } else if (optionObject.type === "flag") {
-        makeFlagBlock(optionObject.flag);
-      } else if (optionObject.type == "delimiter") {
-        makeDelimiterBlock(optionObject.flag);
-      }
+  // Creates an option block based on its type (flag or field_index)
+  function makeOptionBlock(flag, type = "flag") {
+    const blockName = `option_${flag}_${type}`;
+
+    // Get the list of commands compatible with this flag and type
+    const compatibleCommands = Object.entries(optionTooltips)
+      .filter(([_, flags]) => flags[flag] && flags[flag][type])
+      .map(([command]) => command);
+
+    // Base tooltip containing compatible commands or fallback
+    const baseTooltip =
+      compatibleCommands.length > 0
+        ? `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
+        : `Option -${flag}`;
+
+    // Basic option block structure
+    let blocklyJson = {
+      name: `-${flag}`,
+      output: "null",
+      tooltip: baseTooltip,
+    };
+
+    // COnfigure block layout based on the option type
+    switch (type) {
+      case "flag":
+        blocklyJson = {
+          ...blocklyJson,
+          message0: `-${flag} %1`,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          colour: 225,
+        };
+        break;
+
+      case "field_index":
+        blocklyJson = {
+          ...blocklyJson,
+          message0: `-${flag} %1 %2`,
+          args0: [
+            {
+              type: "field_input",
+              name: "PARAM_1",
+              text: "",
+            },
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          colour: 200,
+        };
+        break;
+
+      default:
+        throw new Error(`Type d'option inconnu : ${type}`);
     }
-  }
-
-  // Creates a flag option block for a given flag
-  function makeFlagBlock(flag) {
-    context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_flag",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1`,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-        colour: 225,
-        output: "null",
-      },
+    context.customBlocks.unixfilters.options.push({
+      name: blockName,
+      blocklyJson,
     });
-    context.unixfilters["option_" + flag + "_flag"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_flag");
+
+    context.unixfilters[blockName] = function () {
+      UnixFilters.currentOptions.push(blockName);
     };
   }
 
-  // Creates a field index option block for a given flag
-  function makeFieldIndexBlock(flag) {
-    context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_field_index",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1 %2`,
-        colour: 200,
-        args0: [
-          {
-            type: "field_input",
-            name: "PARAM_1",
-            text: "",
-          },
-          {
-            type: "input_value",
-            name: "PARAM_0",
-            text: "",
-          },
-        ],
-        output: "null",
-      },
+  // Creates a block for a Unix command (grep, sort,...)
+  function makeCommandBlock(commandArray) {
+    commandArray.forEach((command) => {
+      context.customBlocks.unixfilters.commands.push({
+        name: command.commandName,
+        blocklyJson: {
+          tooltip: command.tooltip + "\n" + command.format,
+          colour: 285,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+        },
+        codeGenerators: {
+          Python: (block) =>
+            generateCodeForCommand(command.commandName, block, "Python"),
+          JavaScript: (block) =>
+            generateCodeForCommand(command.commandName, block, "JavaScript"),
+        },
+      });
     });
-    context.unixfilters["option_" + flag + "_field_index"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_field_index");
-    };
   }
 
-  // Creates a delimiter option block for a given flag
-  function makeDelimiterBlock(flag) {
-    context.customBlocks.unixfilters.actions.push({
-      name: "option_" + flag + "_delimiter",
-      blocklyJson: {
-        name: "-" + flag,
-        message0: `-${flag} %1 %2`,
-        colour: 200,
-        args0: [
-          {
-            type: "field_input",
-            name: "PARAM_1",
-            text: "",
-          },
-          {
-            type: "input_value",
-            name: "PARAM_0",
-            text: "",
-          },
-        ],
-        output: "null",
-      },
+  // Creates a "noop" (no-operation) block (placeholder block with no behavior)
+  function makeNoopBlock(noopArray) {
+    noopArray.forEach((noop) => {
+      context.customBlocks.unixfilters.commands.push({
+        name: noop.name,
+        blocklyJson: {
+          colour: noop.colour,
+          type: "noop",
+          message0: "",
+          output: "null",
+        },
+      });
     });
-    context.unixfilters["option_" + flag + "_field_index"] = function () {
-      UnixFilters.currentOptions.push("-" + flag + "_field_index");
-    };
   }
 
-  // Creates a block for a given command name
-  function makeUnixFilterBlock(commandName) {
-    return {
-      name: commandName,
-      blocklyJson: {
-        colour: 285,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-      },
-      codeGenerators: {
-        Python: (block) => generateCodeForCommand(commandName, block, "Python"),
-        JavaScript: (block) =>
-          generateCodeForCommand(commandName, block, "JavaScript"),
-      },
-    };
-  }
-
-  // Creates a block for a given command name
-  function makeNoopBlock(noopObject) {
-    return {
-      name: noopObject.name,
-      blocklyJson: {
-        colour: noopObject.colour,
-        type: "noop",
-        message0: "",
-        output: "null",
-      },
-    };
-  }
-
-  // Creates a block for symbol
-  function makeSymbolBlock(symbolObject) {
-    return {
-      name: symbolObject.name,
-      blocklyJson: {
-        colour: symbolObject.colour,
-        args0: [
-          {
-            type: "input_value",
-            name: "PARAM_0",
-          },
-        ],
-        output: "null",
-      },
-    };
+  // Creates a symbol block (>,>>,<)
+  function makeSymbolBlock(symbolArray) {
+    symbolArray.forEach((symbol) => {
+      context.customBlocks.unixfilters.symbols.push({
+        name: symbol.name,
+        blocklyJson: {
+          colour: symbol.colour,
+          args0: [
+            {
+              type: "input_value",
+              name: "PARAM_0",
+            },
+          ],
+          output: "null",
+        },
+      });
+    });
   }
 
   context.customBlocks = {
     // Define our blocks for our namespace "unixfilters"
     unixfilters: {
       // Categories are reflected in the Blockly menu
-      actions: [
+      inputs: [
         {
           name: "text_input",
           blocklyJson: {
@@ -433,37 +456,36 @@ var getContext = function (display, infos, curLevel) {
             colour: 165,
           },
         },
-
-        makeGrepBlock(),
       ],
+      commands: [makeGrepBlock()],
+      options: [],
+      symbols: [],
     },
   };
 
   // Creates an option block for each option in array
-  OPTIONS.forEach((option) => {
-    makeOptionBlock(option);
+  OPTIONS.forEach(({ flag, type }) => {
+    if (Array.isArray(type)) {
+      type.forEach((t) => makeOptionBlock(flag, t));
+    } else {
+      makeOptionBlock(flag, type);
+    }
   });
 
-  // Creates a block for each command in array
-  COMMAND_NAMES.forEach((command) => {
-    context.customBlocks.unixfilters.actions.push(makeUnixFilterBlock(command));
-  });
-
-  // Creates a symbol block for each name in array
-  SYMBOL_NAMES.forEach((symbol) => {
-    context.customBlocks.unixfilters.actions.push(makeSymbolBlock(symbol));
-  });
-
-  // Creates a noop block for each name in array
-  NOOP_NAMES.forEach((noop) => {
-    context.customBlocks.unixfilters.actions.push(makeNoopBlock(noop));
-  });
+  makeCommandBlock(COMMANDS);
+  makeSymbolBlock(SYMBOL_NAMES);
+  makeNoopBlock(NOOP_NAMES);
 
   // Color indexes of block categories (as a hue in the range 0–420)
   context.provideBlocklyColours = function () {
     return {
       categories: {
-        actions: 0,
+        actions: 224,
+        commands: 285,
+        options: 200,
+        symbols: 50,
+        noop: 225,
+        inputs: 165,
         sensors: 100,
       },
     };
