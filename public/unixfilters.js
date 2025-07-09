@@ -93,7 +93,52 @@ UnixFilters.onChange = function (context) {
     "python code generated",
     task.displayedSubTask.blocklyHelper.getCode("python", null, true)
   );
+  if (!context._tooltipListenerRegistered) {
+    context.blocklyHelper.workspace.addChangeListener(function (event) {
+      console.log("event.type", event.type);
+      if (
+        event.type === "move" ||
+        event.type === "change" ||
+        event.type === "create"
+      ) {
+        console.log("event captured");
+        const block = context.blocklyHelper.workspace.getBlockById(
+          event.blockId || event.newValue
+        );
+        if (block && block.type.startsWith("option_")) {
+          updateOptionBlockTooltips(context);
+        }
+      }
+    });
+    context._tooltipListenerRegistered = true;
+  }
 };
+
+function updateOptionBlockTooltips(context) {
+  const blocks = context.blocklyHelper.workspace.getAllBlocks();
+  for (const block of blocks) {
+    if (block.type.startsWith("option_")) {
+      const newTooltip = getDetailedTooltip(block.type);
+      block.setTooltip(newTooltip);
+    }
+  }
+}
+
+function getDetailedTooltip(blockType) {
+  const parts = blockType.split("_");
+  if (parts.length < 3) return "";
+  const flag = parts[1];
+  const type = parts[2] === "flag" ? "flag" : "field_index";
+
+  const usages = ["Utilisable avec :"];
+  for (const [command, options] of Object.entries(optionTooltips)) {
+    if (options[flag] && options[flag][type]) {
+      usages.push(`${options[flag][type]}`);
+    }
+  }
+
+  return usages.length > 1 ? usages.join("\n") : `Option -${flag}`;
+}
 
 // Fills empty input fields with no-op blocks
 UnixFilters.fillEmptyOptionInputs = function (context) {
