@@ -357,10 +357,19 @@ var getContext = function (display, infos, curLevel) {
         throw new Error(`Type d'option inconnu : ${type}`);
     }
 
+    const fullBlock = {
+      init: function () {
+        this.jsonInit(blocklyJson);
+        const tooltip = getDynamicTooltip(this.type);
+        this.setTooltip(tooltip);
+      },
+    };
+
     for (cde of compatibleCommands) {
       context.customBlocks.unixfilters[cde].push({
         name: blockName + "_" + cde,
         blocklyJson,
+        fullBlock,
       });
     }
     context.unixfilters[blockName] = function () {
@@ -468,7 +477,6 @@ var getContext = function (display, infos, curLevel) {
   Object.entries(optionTooltips).forEach(([command, options]) => {
     Object.entries(options).forEach(([key, data]) => {
       const labelType = data.flag ? "flag" : "field_index";
-      const label = data[labelType];
       makeOptionBlock(key, labelType);
     });
   });

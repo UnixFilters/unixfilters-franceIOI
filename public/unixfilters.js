@@ -11,6 +11,9 @@ UnixFilters.reset = function (taskInfos) {
 
 // Define the display
 UnixFilters.resetDisplay = function (context) {
+  const groupByCategory = context.blocklyHelper.includeBlocks.groupByCategory;
+  window.unixfilters_groupByCategory = groupByCategory;
+
   $("#grid").html(
     "<pre id='score'></pre>" +
       "<pre id='message'></pre>" +
@@ -48,49 +51,33 @@ function findCommandParent(block) {
 }
 
 // Refreshes the tooltip of an option block based on its parent command block
-function refreshOptionTooltip(optionBlock) {
-  const type = optionBlock.type;
-  const match = type.match(/^option_([a-z])_(flag|field_index)_(\w+)$/);
-  if (!match) return;
+function getDynamicTooltip(blockType) {
+  const groupByCategory = window.unixfilters_groupByCategory ?? false;
+  const parts = blockType.split("_");
+  if (parts.length < 3) return "";
+  const flag = parts[1];
+  const type = parts[2] === "flag" ? "flag" : "field_index";
 
-  const flag = match[1];
-  const flagType = match[2];
-
-  const parent = findCommandParent(optionBlock);
-
-  // If the option is specifically associated to this command and type --> show that tooltip
-  if (
-    parent &&
-    optionTooltips[parent.type] &&
-    optionTooltips[parent.type][flag] &&
-    optionTooltips[parent.type][flag][flagType]
-  ) {
-    optionBlock.setTooltip(optionTooltips[parent.type][flag][flagType]);
-  } else {
-    // Else, show list of compatible commands for this flag and type
-    const compatibleCommands = Object.entries(optionTooltips)
-      .filter(([command, flags]) => flags[flag] && flags[flag][flagType])
-      .map(([command]) => command);
-
-    if (compatibleCommands.length > 0) {
-      optionBlock.setTooltip(
-        `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
-      );
-    } else {
-      optionBlock.setTooltip("Option -" + flag);
+  if (groupByCategory) {
+    for (const [command, options] of Object.entries(optionTooltips)) {
+      if (options[flag] && options[flag][type]) {
+        return options[flag][type];
+      }
     }
+    return `Option -${flag}`;
+  } else {
+    const usages = ["Utilisable avec :"];
+    for (const [command, options] of Object.entries(optionTooltips)) {
+      if (options[flag] && options[flag][type]) {
+        usages.push(`${options[flag][type]}`);
+      }
+    }
+    return usages.length ? usages.join("\n") : `Option -${flag}`;
   }
 }
 
 // Every time there is a change in the interface
 UnixFilters.onChange = function (context) {
-  const allBlocks = context.blocklyHelper.workspace.getAllBlocks();
-  for (const block of allBlocks) {
-    if (block.type.startsWith("option_")) {
-      refreshOptionTooltip(block);
-    }
-  }
-
   // Generates code from blocks for blocks attached to the block "Ligne de commande"
   var programBlock = context.blocklyHelper.workspace
     .getTopBlocks(true)
