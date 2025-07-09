@@ -220,7 +220,7 @@ UnixFilters.showStep = function (index) {
   $("#etape").text(index);
   $("#jsonStep").text(step.command_string);
   if (step.return === 0) {
-    if (step.output == "") {
+    if (step.output === "" || step.output === null) {
       document.getElementById("output").style.color = "grey";
       $("#output").text("Sortie vide");
     } else {
