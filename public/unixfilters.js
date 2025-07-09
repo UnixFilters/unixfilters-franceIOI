@@ -50,7 +50,7 @@ function findCommandParent(block) {
 // Refreshes the tooltip of an option block based on its parent command block
 function refreshOptionTooltip(optionBlock) {
   const type = optionBlock.type;
-  const match = type.match(/^option_([a-z])_(flag|field_index)$/);
+  const match = type.match(/^option_([a-z])_(flag|field_index)_(\w+)$/);
   if (!match) return;
 
   const flag = match[1];

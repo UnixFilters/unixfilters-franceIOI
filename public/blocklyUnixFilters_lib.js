@@ -5,8 +5,18 @@ var getContext = function (display, infos, curLevel) {
   var localLanguageStrings = {
     fr: {
       categories: {
-        commands: "Commandes",
-        options: "Options",
+        cat: "Cat",
+        sort: "Sort",
+        head: "Head",
+        cut: "Cut",
+        tail: "Tail",
+        tee: "Tee",
+        tr: "Tr",
+        uniq: "Uniq",
+        wc: "Wc",
+        sed: "Sed",
+        grep: "Grep",
+        // options: "Options",
         symbols: "Redirections",
         inputs: "Entrée",
       },
@@ -283,7 +293,7 @@ var getContext = function (display, infos, curLevel) {
       return "grep(" + JSON.stringify(args) + ")\n";
     };
 
-    return {
+    const block = {
       name: blockJson.name,
       category: blockJson.category,
       blocklyJson: blockJson,
@@ -293,6 +303,11 @@ var getContext = function (display, infos, curLevel) {
         Python: generateCode,
       },
     };
+    if (!context.customBlocks.unixfilters["grep"]) {
+      context.customBlocks.unixfilters["grep"] = [];
+    }
+
+    context.customBlocks.unixfilters["grep"].push(block);
   }
 
   // Generates code for a command using the extracted options and/or filename
@@ -363,10 +378,31 @@ var getContext = function (display, infos, curLevel) {
       default:
         throw new Error(`Type d'option inconnu : ${type}`);
     }
-    context.customBlocks.unixfilters.options.push({
-      name: blockName,
-      blocklyJson,
-    });
+
+    for (cde of compatibleCommands) {
+      console.log("adding", blockName, "to", cde);
+      context.customBlocks.unixfilters[cde].push({
+        name: blockName + "_" + cde,
+        blocklyJson,
+      });
+    }
+    // for (const [command, flags] of Object.entries(optionTooltips)) {
+    //   if (flags[flag] && (flags[flag][type] || flags[flag] === type)) {
+    //     if (!context.customBlocks.unixfilters[command]) {
+    //       console.log("doesn't exist", command);
+    //       context.customBlocks.unixfilters[command] = [];
+    //     }
+
+    //     context.customBlocks.unixfilters[command].push({
+    //       name: blockName,
+    //       blocklyJson,
+    //     });
+    //   }
+    // }
+    // context.customBlocks.unixfilters.options.push({
+    //   name: blockName,
+    //   blocklyJson,
+    // });
 
     context.unixfilters[blockName] = function () {
       UnixFilters.currentOptions.push(blockName);
@@ -376,7 +412,7 @@ var getContext = function (display, infos, curLevel) {
   // Creates a block for a Unix command (grep, sort,...)
   function makeCommandBlock(commandArray) {
     commandArray.forEach((command) => {
-      context.customBlocks.unixfilters.commands.push({
+      const block = {
         name: command.commandName,
         blocklyJson: {
           tooltip: command.tooltip + "\n" + command.format,
@@ -394,7 +430,13 @@ var getContext = function (display, infos, curLevel) {
           JavaScript: (block) =>
             generateCodeForCommand(command.commandName, block, "JavaScript"),
         },
-      });
+      };
+
+      if (!context.customBlocks.unixfilters[command.commandName]) {
+        context.customBlocks.unixfilters[command.commandName] = [];
+      }
+
+      context.customBlocks.unixfilters[command.commandName].push(block);
     });
   }
 
@@ -457,12 +499,13 @@ var getContext = function (display, infos, curLevel) {
           },
         },
       ],
-      commands: [makeGrepBlock()],
-      options: [],
+      commands: [],
+      // options: [],
       symbols: [],
     },
   };
-
+  makeCommandBlock(COMMANDS);
+  makeGrepBlock();
   // Creates an option block for each option in array
   OPTIONS.forEach(({ flag, type }) => {
     if (Array.isArray(type)) {
@@ -472,7 +515,6 @@ var getContext = function (display, infos, curLevel) {
     }
   });
 
-  makeCommandBlock(COMMANDS);
   makeSymbolBlock(SYMBOL_NAMES);
   makeNoopBlock(NOOP_NAMES);
 
@@ -482,11 +524,21 @@ var getContext = function (display, infos, curLevel) {
       categories: {
         actions: 224,
         commands: 285,
-        options: 200,
+        // options: 200,
         symbols: 50,
         noop: 225,
         inputs: 165,
-        sensors: 100,
+        cat: 285,
+        sort: 285,
+        head: 285,
+        cut: 285,
+        tail: 285,
+        tee: 285,
+        tr: 285,
+        uniq: 285,
+        wc: 285,
+        sed: 285,
+        grep: 285,
       },
     };
   };

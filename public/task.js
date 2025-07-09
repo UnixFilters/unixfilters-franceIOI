@@ -22,25 +22,73 @@ function initTask(subTask) {
           "uniq",
           "wc",
           "sed",
-          "option_i_flag",
-          "option_v_flag",
-          "option_i_flag",
-          "option_n_flag",
-          "option_c_flag",
-          "option_r_flag",
-          "option_u_flag",
-          "option_n_field_index",
-          "option_k_field_index",
-          "option_c_field_index",
-          "option_d_field_index",
-          "option_t_field_index",
-          "option_f_field_index",
-          "option_b_field_index",
-          "option_a_flag",
-          "option_d_flag",
-          "option_l_flag",
-          "option_w_flag",
-          "option_m_flag",
+          // CUT
+          "option_f_field_index_cut",
+          "option_b_field_index_cut",
+          "option_c_field_index_cut",
+          "option_d_field_index_cut",
+
+          // GREP
+          "option_i_flag_grep",
+          "option_v_flag_grep",
+          "option_r_flag_grep",
+          "option_l_flag_grep",
+          "option_w_flag_grep",
+          "option_n_flag_grep",
+          "option_c_flag_grep",
+
+          // HEAD
+          "option_n_field_index_head",
+          "option_c_field_index_head",
+
+          // SORT
+          "option_u_flag_sort",
+          "option_n_flag_sort",
+          "option_r_flag_sort",
+          "option_k_field_index_sort",
+
+          // TAIL
+          "option_n_field_index_tail",
+          "option_c_field_index_tail",
+
+          // TEE
+          "option_a_flag_tee",
+
+          // TR
+          "option_d_flag_tr",
+          "option_s_flag_tr",
+
+          // UNIQ
+          "option_c_flag_uniq",
+
+          // WC
+          "option_c_flag_wc",
+          "option_m_flag_wc",
+          "option_w_flag_wc",
+          "option_l_flag_wc",
+
+          // SED
+          "option_i_flag_sed",
+          "option_n_flag_sed",
+          "option_r_flag_sed",
+
+          // "option_i_flag",
+          // "option_n_flag",
+          // "option_c_flag",
+          // "option_r_flag",
+          // "option_u_flag",
+          // "option_n_field_index",
+          // "option_k_field_index",
+          // "option_c_field_index",
+          // "option_d_field_index",
+          // // "option_t_field_index",
+          // "option_f_field_index",
+          // "option_b_field_index",
+          // "option_a_flag",
+          // "option_d_flag",
+          // "option_l_flag",
+          // "option_w_flag",
+          // "option_m_flag",
         ],
       },
       singleBlocks: ["text"],
