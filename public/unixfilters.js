@@ -235,9 +235,9 @@ UnixFilters.showStep = function (index) {
 
 // Utility function to determine the type of no-op block to create based on the block type
 function getNoopTypeFromBlockType(blockType) {
-  if (blockType.endsWith("_flag")) {
+  if (blockType.includes("_flag")) {
     return "noop_option_flag";
-  } else if (blockType.endsWith("_field_index")) {
+  } else if (blockType.includes("_field_index")) {
     return "noop_option_field_index";
   } else if (blockType.startsWith("text")) {
     return "noop_text";

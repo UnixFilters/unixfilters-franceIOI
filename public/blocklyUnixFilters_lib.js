@@ -221,26 +221,6 @@ var getContext = function (display, infos, curLevel) {
     },
   ];
 
-  // Array defining available options for flags and field indices
-  const OPTIONS = [
-    { flag: "v", type: "flag" },
-    { flag: "i", type: "flag" },
-    { flag: "n", type: ["flag", "field_index"] },
-    { flag: "c", type: ["flag", "field_index"] },
-    { flag: "r", type: "flag" },
-    { flag: "u", type: "flag" },
-    { flag: "k", type: "field_index" },
-    { flag: "d", type: ["flag", "field_index"] },
-    { flag: "t", type: "field_index" },
-    { flag: "f", type: "field_index" },
-    { flag: "b", type: "field_index" },
-    { flag: "a", type: "flag" },
-    { flag: "s", type: "flag" },
-    { flag: "w", type: "flag" },
-    { flag: "l", type: "flag" },
-    { flag: "m", type: "flag" },
-  ];
-
   // Array defining symbol name and colour
   const SYMBOL_NAMES = [
     { name: "symbol_greater_than", colour: 25 },
@@ -378,30 +358,11 @@ var getContext = function (display, infos, curLevel) {
     }
 
     for (cde of compatibleCommands) {
-      console.log("adding", blockName, "to", cde);
       context.customBlocks.unixfilters[cde].push({
         name: blockName + "_" + cde,
         blocklyJson,
       });
     }
-    // for (const [command, flags] of Object.entries(optionTooltips)) {
-    //   if (flags[flag] && (flags[flag][type] || flags[flag] === type)) {
-    //     if (!context.customBlocks.unixfilters[command]) {
-    //       console.log("doesn't exist", command);
-    //       context.customBlocks.unixfilters[command] = [];
-    //     }
-
-    //     context.customBlocks.unixfilters[command].push({
-    //       name: blockName,
-    //       blocklyJson,
-    //     });
-    //   }
-    // }
-    // context.customBlocks.unixfilters.options.push({
-    //   name: blockName,
-    //   blocklyJson,
-    // });
-
     context.unixfilters[blockName] = function () {
       UnixFilters.currentOptions.push(blockName);
     };
@@ -503,13 +464,13 @@ var getContext = function (display, infos, curLevel) {
   };
   makeCommandBlock(COMMANDS);
   makeGrepBlock();
-  // Creates an option block for each option in array
-  OPTIONS.forEach(({ flag, type }) => {
-    if (Array.isArray(type)) {
-      type.forEach((t) => makeOptionBlock(flag, t));
-    } else {
-      makeOptionBlock(flag, type);
-    }
+
+  Object.entries(optionTooltips).forEach(([command, options]) => {
+    Object.entries(options).forEach(([key, data]) => {
+      const labelType = data.flag ? "flag" : "field_index";
+      const label = data[labelType];
+      makeOptionBlock(key, labelType);
+    });
   });
 
   makeSymbolBlock(SYMBOL_NAMES);
