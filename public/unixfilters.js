@@ -161,7 +161,7 @@ UnixFilters.sendCommandToServer = async function () {
 
     const jsonData = await response.json();
 
-    console.log("JSON DATA STEPS", jsonData.steps);
+    console.log("JSON DATA: ", jsonData.steps);
 
     updateScore(jsonData.score);
     $("#message").text(jsonData.message);
