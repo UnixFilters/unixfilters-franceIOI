@@ -5,18 +5,17 @@ var getContext = function (display, infos, curLevel) {
   var localLanguageStrings = {
     fr: {
       categories: {
-        cat: "Cat",
-        sort: "Sort",
-        head: "Head",
-        cut: "Cut",
-        tail: "Tail",
-        tee: "Tee",
-        tr: "Tr",
-        uniq: "Uniq",
-        wc: "Wc",
-        sed: "Sed",
-        grep: "Grep",
-        // options: "Options",
+        cat: "cat",
+        sort: "sort",
+        head: "head",
+        cut: "cut",
+        tail: "tail",
+        tee: "tee",
+        tr: "tr",
+        uniq: "uniq",
+        wc: "wc",
+        sed: "sed",
+        grep: "grep",
         symbols: "Redirections",
         inputs: "Entrée",
       },
@@ -261,7 +260,6 @@ var getContext = function (display, infos, curLevel) {
     // Function to make a grep block
     var blockJson = {
       name: "grep",
-      category: "commands",
       colour: 285,
       tooltip:
         "Permet de rechercher un motif dans un fichier.\ngrep pattern [options] [FICHIER] ",
@@ -500,7 +498,6 @@ var getContext = function (display, infos, curLevel) {
         },
       ],
       commands: [],
-      // options: [],
       symbols: [],
     },
   };
@@ -522,9 +519,6 @@ var getContext = function (display, infos, curLevel) {
   context.provideBlocklyColours = function () {
     return {
       categories: {
-        actions: 224,
-        commands: 285,
-        // options: 200,
         symbols: 50,
         noop: 225,
         inputs: 165,

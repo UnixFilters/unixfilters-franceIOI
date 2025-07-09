@@ -7,49 +7,49 @@ function initTask(subTask) {
       groupByCategory: true,
       generatedBlocks: {
         unixfilters: [
-          "cat",
-          "grep",
           "symbol_greater_than",
           "symbol_even_greater_than",
           "symbol_less_than",
           "text_input",
-          "sort",
-          "head",
+          "cat",
           "cut",
+          "grep",
+          "head",
+          "sed",
+          "sort",
           "tail",
           "tee",
           "tr",
           "uniq",
           "wc",
-          "sed",
           // CUT
-          "option_f_field_index_cut",
           "option_b_field_index_cut",
           "option_c_field_index_cut",
           "option_d_field_index_cut",
+          "option_f_field_index_cut",
 
           // GREP
-          "option_i_flag_grep",
-          "option_v_flag_grep",
-          "option_r_flag_grep",
-          "option_l_flag_grep",
-          "option_w_flag_grep",
-          "option_n_flag_grep",
           "option_c_flag_grep",
+          "option_i_flag_grep",
+          "option_l_flag_grep",
+          "option_n_flag_grep",
+          "option_r_flag_grep",
+          "option_v_flag_grep",
+          "option_w_flag_grep",
 
           // HEAD
-          "option_n_field_index_head",
           "option_c_field_index_head",
+          "option_n_field_index_head",
 
           // SORT
-          "option_u_flag_sort",
+          "option_k_field_index_sort",
           "option_n_flag_sort",
           "option_r_flag_sort",
-          "option_k_field_index_sort",
+          "option_u_flag_sort",
 
           // TAIL
-          "option_n_field_index_tail",
           "option_c_field_index_tail",
+          "option_n_field_index_tail",
 
           // TEE
           "option_a_flag_tee",
@@ -63,9 +63,9 @@ function initTask(subTask) {
 
           // WC
           "option_c_flag_wc",
+          "option_l_flag_wc",
           "option_m_flag_wc",
           "option_w_flag_wc",
-          "option_l_flag_wc",
 
           // SED
           "option_i_flag_sed",
