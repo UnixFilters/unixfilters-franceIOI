@@ -12,7 +12,9 @@ UnixFilters.reset = function (taskInfos) {
 // Define the display
 UnixFilters.resetDisplay = function (context) {
   $("#grid").html(
-    "<button id='backToBeginning'>Reset</button>" +
+    "<pre id='score'></pre>" +
+      "<pre id='message'></pre>" +
+      "<button id='backToBeginning'>Reset</button>" +
       "<button id='executeCommand'>Exécuter</button>" +
       "<button id='step-by-step'>Step by step</button>" +
       "<button id='goToEnd'>End</button>" +
@@ -156,16 +158,31 @@ UnixFilters.sendCommandToServer = async function () {
         `Error sending the request to the server: ${errorData.error}`
       );
     }
-    const jsonData = await response.json();
-    console.log("JSON DATA", jsonData);
-    $("#output").text(jsonData);
 
-    // UnixFilters.parseJson(jsonData);
-    // UnixFilters.showStep(UnixFilters.lastIndex);
+    const jsonData = await response.json();
+
+    console.log("JSON DATA: ", jsonData.steps);
+
+    updateScore(jsonData.score);
+    $("#message").text(jsonData.message);
+
+    UnixFilters.parseJson(jsonData.steps);
+    UnixFilters.showStep(UnixFilters.lastIndex);
   } catch (error) {
     console.error("Error when sending command:", error);
   }
 };
+
+function updateScore(score) {
+  if (score === "100") {
+    document.getElementById("score").style.color = "green";
+  } else if (score === "90") {
+    document.getElementById("score").style.color = "orange";
+  } else {
+    document.getElementById("score").style.color = "red";
+  }
+  $("#score").text("Score : " + score);
+}
 
 // Parses the JSON data returned and prepares the steps
 UnixFilters.parseJson = function (jsonData) {
