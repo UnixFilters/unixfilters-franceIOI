@@ -174,9 +174,9 @@ UnixFilters.sendCommandToServer = async function () {
 };
 
 function updateScore(score) {
-  if (score === "100") {
+  if (score === 100) {
     document.getElementById("score").style.color = "green";
-  } else if (score === "90") {
+  } else if (score === 90) {
     document.getElementById("score").style.color = "orange";
   } else {
     document.getElementById("score").style.color = "red";
