@@ -95,13 +95,11 @@ UnixFilters.onChange = function (context) {
   );
   if (!context._tooltipListenerRegistered) {
     context.blocklyHelper.workspace.addChangeListener(function (event) {
-      console.log("event.type", event.type);
       if (
         event.type === "move" ||
         event.type === "change" ||
         event.type === "create"
       ) {
-        console.log("event captured");
         const block = context.blocklyHelper.workspace.getBlockById(
           event.blockId || event.newValue
         );
