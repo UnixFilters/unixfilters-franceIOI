@@ -11,6 +11,9 @@ UnixFilters.reset = function (taskInfos) {
 
 // Define the display
 UnixFilters.resetDisplay = function (context) {
+  const groupByCategory = context.blocklyHelper.includeBlocks.groupByCategory;
+  window.unixfilters_groupByCategory = groupByCategory;
+
   $("#grid").html(
     "<pre id='score'></pre>" +
       "<pre id='message'></pre>" +
@@ -38,59 +41,40 @@ UnixFilters.resetDisplay = function (context) {
   });
 };
 
-// Finds the closest parent block that is a known Unix command recursively
-function findCommandParent(block) {
-  let current = block.getParent();
-  while (current && !optionTooltips[current.type]) {
-    current = current.getParent();
-  }
-  return current;
-}
-
 // Refreshes the tooltip of an option block based on its parent command block
-function refreshOptionTooltip(optionBlock) {
-  const type = optionBlock.type;
-  const match = type.match(/^option_([a-z])_(flag|field_index)$/);
-  if (!match) return;
+function getDynamicTooltip(blockType) {
+  // Check if blocks are sorted into categories
+  const groupByCategory = window.unixfilters_groupByCategory ?? false;
+  // Get the type (flag/field_index) and the command name
+  const parts = blockType.split("_");
+  if (parts.length < 3) return "";
+  const flag = parts[1];
+  const type = parts[2] === "flag" ? "flag" : "field_index";
+  const commandName = parts[parts.length - 1];
 
-  const flag = match[1];
-  const flagType = match[2];
-
-  const parent = findCommandParent(optionBlock);
-
-  // If the option is specifically associated to this command and type --> show that tooltip
-  if (
-    parent &&
-    optionTooltips[parent.type] &&
-    optionTooltips[parent.type][flag] &&
-    optionTooltips[parent.type][flag][flagType]
-  ) {
-    optionBlock.setTooltip(optionTooltips[parent.type][flag][flagType]);
-  } else {
-    // Else, show list of compatible commands for this flag and type
-    const compatibleCommands = Object.entries(optionTooltips)
-      .filter(([command, flags]) => flags[flag] && flags[flag][flagType])
-      .map(([command]) => command);
-
-    if (compatibleCommands.length > 0) {
-      optionBlock.setTooltip(
-        `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
-      );
-    } else {
-      optionBlock.setTooltip("Option -" + flag);
+  // If the toolbox is organised in catgories, only show the tooltip specific to the option + command name
+  if (groupByCategory) {
+    for (const [command, options] of Object.entries(optionTooltips)) {
+      if (command == commandName && options[flag] && options[flag][type]) {
+        return options[flag][type];
+      }
     }
+    return `Option -${flag}`;
+  }
+  // Else, show the commands which the option can be used with
+  else {
+    const usages = ["Utilisable avec :"];
+    for (const [command, options] of Object.entries(optionTooltips)) {
+      if (options[flag] && options[flag][type]) {
+        usages.push(`${options[flag][type]}`);
+      }
+    }
+    return usages.length ? usages.join("\n") : `Option -${flag}`;
   }
 }
 
 // Every time there is a change in the interface
 UnixFilters.onChange = function (context) {
-  const allBlocks = context.blocklyHelper.workspace.getAllBlocks();
-  for (const block of allBlocks) {
-    if (block.type.startsWith("option_")) {
-      refreshOptionTooltip(block);
-    }
-  }
-
   // Generates code from blocks for blocks attached to the block "Ligne de commande"
   var programBlock = context.blocklyHelper.workspace
     .getTopBlocks(true)
@@ -106,7 +90,50 @@ UnixFilters.onChange = function (context) {
     "python code generated",
     task.displayedSubTask.blocklyHelper.getCode("python", null, true)
   );
+  if (!context._tooltipListenerRegistered) {
+    context.blocklyHelper.workspace.addChangeListener(function (event) {
+      if (
+        event.type === "move" ||
+        event.type === "change" ||
+        event.type === "create"
+      ) {
+        const block = context.blocklyHelper.workspace.getBlockById(
+          event.blockId || event.newValue
+        );
+        if (block && block.type.startsWith("option_")) {
+          updateOptionBlockTooltips(context);
+        }
+      }
+    });
+    context._tooltipListenerRegistered = true;
+  }
 };
+
+function updateOptionBlockTooltips(context) {
+  const blocks = context.blocklyHelper.workspace.getAllBlocks();
+  for (const block of blocks) {
+    if (block.type.startsWith("option_")) {
+      const newTooltip = getDetailedTooltip(block.type);
+      block.setTooltip(newTooltip);
+    }
+  }
+}
+
+function getDetailedTooltip(blockType) {
+  const parts = blockType.split("_");
+  if (parts.length < 3) return "";
+  const flag = parts[1];
+  const type = parts[2] === "flag" ? "flag" : "field_index";
+
+  const usages = ["Utilisable avec :"];
+  for (const [command, options] of Object.entries(optionTooltips)) {
+    if (options[flag] && options[flag][type]) {
+      usages.push(`${options[flag][type]}`);
+    }
+  }
+
+  return usages.length > 1 ? usages.join("\n") : `Option -${flag}`;
+}
 
 // Fills empty input fields with no-op blocks
 UnixFilters.fillEmptyOptionInputs = function (context) {
@@ -174,9 +201,9 @@ UnixFilters.sendCommandToServer = async function () {
 };
 
 function updateScore(score) {
-  if (score === "100") {
+  if (score === 100) {
     document.getElementById("score").style.color = "green";
-  } else if (score === "90") {
+  } else if (score === 90) {
     document.getElementById("score").style.color = "orange";
   } else {
     document.getElementById("score").style.color = "red";
@@ -220,7 +247,7 @@ UnixFilters.showStep = function (index) {
   $("#etape").text(index);
   $("#jsonStep").text(step.command_string);
   if (step.return === 0) {
-    if (step.output == "") {
+    if (step.output === "" || step.output === null) {
       document.getElementById("output").style.color = "grey";
       $("#output").text("Sortie vide");
     } else {
@@ -235,9 +262,9 @@ UnixFilters.showStep = function (index) {
 
 // Utility function to determine the type of no-op block to create based on the block type
 function getNoopTypeFromBlockType(blockType) {
-  if (blockType.endsWith("_flag")) {
+  if (blockType.includes("_flag")) {
     return "noop_option_flag";
-  } else if (blockType.endsWith("_field_index")) {
+  } else if (blockType.includes("_field_index")) {
     return "noop_option_field_index";
   } else if (blockType.startsWith("text")) {
     return "noop_text";

@@ -5,8 +5,17 @@ var getContext = function (display, infos, curLevel) {
   var localLanguageStrings = {
     fr: {
       categories: {
-        commands: "Commandes",
-        options: "Options",
+        cat: "cat",
+        sort: "sort",
+        head: "head",
+        cut: "cut",
+        tail: "tail",
+        tee: "tee",
+        tr: "tr",
+        uniq: "uniq",
+        wc: "wc",
+        sed: "sed",
+        grep: "grep",
         symbols: "Redirections",
         inputs: "Entrée",
       },
@@ -212,26 +221,6 @@ var getContext = function (display, infos, curLevel) {
     },
   ];
 
-  // Array defining available options for flags and field indices
-  const OPTIONS = [
-    { flag: "v", type: "flag" },
-    { flag: "i", type: "flag" },
-    { flag: "n", type: ["flag", "field_index"] },
-    { flag: "c", type: ["flag", "field_index"] },
-    { flag: "r", type: "flag" },
-    { flag: "u", type: "flag" },
-    { flag: "k", type: "field_index" },
-    { flag: "d", type: ["flag", "field_index"] },
-    { flag: "t", type: "field_index" },
-    { flag: "f", type: "field_index" },
-    { flag: "b", type: "field_index" },
-    { flag: "a", type: "flag" },
-    { flag: "s", type: "flag" },
-    { flag: "w", type: "flag" },
-    { flag: "l", type: "flag" },
-    { flag: "m", type: "flag" },
-  ];
-
   // Array defining symbol name and colour
   const SYMBOL_NAMES = [
     { name: "symbol_greater_than", colour: 25 },
@@ -251,7 +240,6 @@ var getContext = function (display, infos, curLevel) {
     // Function to make a grep block
     var blockJson = {
       name: "grep",
-      category: "commands",
       colour: 285,
       tooltip:
         "Permet de rechercher un motif dans un fichier.\ngrep pattern [options] [FICHIER] ",
@@ -283,7 +271,7 @@ var getContext = function (display, infos, curLevel) {
       return "grep(" + JSON.stringify(args) + ")\n";
     };
 
-    return {
+    const block = {
       name: blockJson.name,
       category: blockJson.category,
       blocklyJson: blockJson,
@@ -293,6 +281,11 @@ var getContext = function (display, infos, curLevel) {
         Python: generateCode,
       },
     };
+    if (!context.customBlocks.unixfilters["grep"]) {
+      context.customBlocks.unixfilters["grep"] = [];
+    }
+
+    context.customBlocks.unixfilters["grep"].push(block);
   }
 
   // Generates code for a command using the extracted options and/or filename
@@ -312,17 +305,10 @@ var getContext = function (display, infos, curLevel) {
       .filter(([_, flags]) => flags[flag] && flags[flag][type])
       .map(([command]) => command);
 
-    // Base tooltip containing compatible commands or fallback
-    const baseTooltip =
-      compatibleCommands.length > 0
-        ? `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
-        : `Option -${flag}`;
-
     // Basic option block structure
     let blocklyJson = {
       name: `-${flag}`,
       output: "null",
-      tooltip: baseTooltip,
     };
 
     // COnfigure block layout based on the option type
@@ -363,11 +349,22 @@ var getContext = function (display, infos, curLevel) {
       default:
         throw new Error(`Type d'option inconnu : ${type}`);
     }
-    context.customBlocks.unixfilters.options.push({
-      name: blockName,
-      blocklyJson,
-    });
 
+    const fullBlock = {
+      init: function () {
+        this.jsonInit(blocklyJson);
+        const tooltip = getDynamicTooltip(this.type);
+        this.setTooltip(tooltip);
+      },
+    };
+
+    for (cde of compatibleCommands) {
+      context.customBlocks.unixfilters[cde].push({
+        name: blockName + "_" + cde,
+        blocklyJson,
+        fullBlock,
+      });
+    }
     context.unixfilters[blockName] = function () {
       UnixFilters.currentOptions.push(blockName);
     };
@@ -376,7 +373,7 @@ var getContext = function (display, infos, curLevel) {
   // Creates a block for a Unix command (grep, sort,...)
   function makeCommandBlock(commandArray) {
     commandArray.forEach((command) => {
-      context.customBlocks.unixfilters.commands.push({
+      const block = {
         name: command.commandName,
         blocklyJson: {
           tooltip: command.tooltip + "\n" + command.format,
@@ -394,7 +391,13 @@ var getContext = function (display, infos, curLevel) {
           JavaScript: (block) =>
             generateCodeForCommand(command.commandName, block, "JavaScript"),
         },
-      });
+      };
+
+      if (!context.customBlocks.unixfilters[command.commandName]) {
+        context.customBlocks.unixfilters[command.commandName] = [];
+      }
+
+      context.customBlocks.unixfilters[command.commandName].push(block);
     });
   }
 
@@ -457,22 +460,20 @@ var getContext = function (display, infos, curLevel) {
           },
         },
       ],
-      commands: [makeGrepBlock()],
-      options: [],
+      commands: [],
       symbols: [],
     },
   };
+  makeCommandBlock(COMMANDS);
+  makeGrepBlock();
 
-  // Creates an option block for each option in array
-  OPTIONS.forEach(({ flag, type }) => {
-    if (Array.isArray(type)) {
-      type.forEach((t) => makeOptionBlock(flag, t));
-    } else {
-      makeOptionBlock(flag, type);
-    }
+  Object.entries(optionTooltips).forEach(([command, options]) => {
+    Object.entries(options).forEach(([key, data]) => {
+      const labelType = data.flag ? "flag" : "field_index";
+      makeOptionBlock(key, labelType);
+    });
   });
 
-  makeCommandBlock(COMMANDS);
   makeSymbolBlock(SYMBOL_NAMES);
   makeNoopBlock(NOOP_NAMES);
 
@@ -480,13 +481,20 @@ var getContext = function (display, infos, curLevel) {
   context.provideBlocklyColours = function () {
     return {
       categories: {
-        actions: 224,
-        commands: 285,
-        options: 200,
         symbols: 50,
         noop: 225,
         inputs: 165,
-        sensors: 100,
+        cat: 285,
+        sort: 285,
+        head: 285,
+        cut: 285,
+        tail: 285,
+        tee: 285,
+        tr: 285,
+        uniq: 285,
+        wc: 285,
+        sed: 285,
+        grep: 285,
       },
     };
   };
