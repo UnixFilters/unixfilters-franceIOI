@@ -353,7 +353,7 @@ var getContext = function (display, infos, curLevel) {
     const fullBlock = {
       init: function () {
         this.jsonInit(blocklyJson);
-        const tooltip = getDynamicTooltip(this.type);
+        const tooltip = getDynamicTooltipForToolbox(this.type);
         this.setTooltip(tooltip);
       },
     };
