@@ -41,31 +41,28 @@ UnixFilters.resetDisplay = function (context) {
   });
 };
 
-// Finds the closest parent block that is a known Unix command recursively
-function findCommandParent(block) {
-  let current = block.getParent();
-  while (current && !optionTooltips[current.type]) {
-    current = current.getParent();
-  }
-  return current;
-}
-
 // Refreshes the tooltip of an option block based on its parent command block
 function getDynamicTooltip(blockType) {
+  // Check if blocks are sorted into categories
   const groupByCategory = window.unixfilters_groupByCategory ?? false;
+  // Get the type (flag/field_index) and the command name
   const parts = blockType.split("_");
   if (parts.length < 3) return "";
   const flag = parts[1];
   const type = parts[2] === "flag" ? "flag" : "field_index";
+  const commandName = parts[parts.length - 1];
 
+  // If the toolbox is organised in catgories, only show the tooltip specific to the option + command name
   if (groupByCategory) {
     for (const [command, options] of Object.entries(optionTooltips)) {
-      if (options[flag] && options[flag][type]) {
+      if (command == commandName && options[flag] && options[flag][type]) {
         return options[flag][type];
       }
     }
     return `Option -${flag}`;
-  } else {
+  }
+  // Else, show the commands which the option can be used with
+  else {
     const usages = ["Utilisable avec :"];
     for (const [command, options] of Object.entries(optionTooltips)) {
       if (options[flag] && options[flag][type]) {

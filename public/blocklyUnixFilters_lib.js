@@ -305,17 +305,10 @@ var getContext = function (display, infos, curLevel) {
       .filter(([_, flags]) => flags[flag] && flags[flag][type])
       .map(([command]) => command);
 
-    // Base tooltip containing compatible commands or fallback
-    const baseTooltip =
-      compatibleCommands.length > 0
-        ? `Option -${flag} utilisable avec : ${compatibleCommands.join(", ")}`
-        : `Option -${flag}`;
-
     // Basic option block structure
     let blocklyJson = {
       name: `-${flag}`,
       output: "null",
-      tooltip: baseTooltip,
     };
 
     // COnfigure block layout based on the option type
