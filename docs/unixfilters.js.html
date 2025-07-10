@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: unixfilters.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: unixfilters.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @file blocklyUnixFilters_lib.js
  * @description Functions related to Blockly blocks for Unix filters.
  * @module unixfilters
@@ -35,19 +63,19 @@ UnixFilters.resetDisplay = function (context) {
   window.unixfilters_groupByCategory = groupByCategory;
 
   $("#grid").html(
-    "<pre id='score'></pre>" +
-      "<pre id='message'></pre>" +
-      "<button id='backToBeginning'>Reset</button>" +
-      "<button id='executeCommand'>Exécuter</button>" +
-      "<button id='step-by-step'>Step by step</button>" +
-      "<button id='goToEnd'>End</button>" +
-      "<h3> Code généré</h3>" +
-      "<pre id='generatedCode'></pre>" +
-      "<h3>Étape en cours</h3>" +
-      "<pre id='jsonStep'></pre>" +
-      "<h3>Sortie courante</h3>" +
-      "<pre id='output'></pre>" +
-      "<pre id='commandInput'></pre>"
+    "&lt;pre id='score'>&lt;/pre>" +
+      "&lt;pre id='message'>&lt;/pre>" +
+      "&lt;button id='backToBeginning'>Reset&lt;/button>" +
+      "&lt;button id='executeCommand'>Exécuter&lt;/button>" +
+      "&lt;button id='step-by-step'>Step by step&lt;/button>" +
+      "&lt;button id='goToEnd'>End&lt;/button>" +
+      "&lt;h3> Code généré&lt;/h3>" +
+      "&lt;pre id='generatedCode'>&lt;/pre>" +
+      "&lt;h3>Étape en cours&lt;/h3>" +
+      "&lt;pre id='jsonStep'>&lt;/pre>" +
+      "&lt;h3>Sortie courante&lt;/h3>" +
+      "&lt;pre id='output'>&lt;/pre>" +
+      "&lt;pre id='commandInput'>&lt;/pre>"
   );
 
   // Add event listeners to buttons and link them to their functions
@@ -67,7 +95,7 @@ function getDynamicTooltip(blockType) {
   const groupByCategory = window.unixfilters_groupByCategory ?? false;
   // Get the type (flag/field_index) and the command name
   const parts = blockType.split("_");
-  if (parts.length < 3) return "";
+  if (parts.length &lt; 3) return "";
   const flag = parts[1];
   const type = parts[2] === "flag" ? "flag" : "field_index";
   const commandName = parts[parts.length - 1];
@@ -75,7 +103,7 @@ function getDynamicTooltip(blockType) {
   // If the toolbox is organised in catgories, only show the tooltip specific to the option + command name
   if (groupByCategory) {
     for (const [command, options] of Object.entries(optionTooltips)) {
-      if (command == commandName && options[flag] && options[flag][type]) {
+      if (command == commandName &amp;&amp; options[flag] &amp;&amp; options[flag][type]) {
         return options[flag][type];
       }
     }
@@ -85,7 +113,7 @@ function getDynamicTooltip(blockType) {
   else {
     const usages = ["Utilisable avec :"];
     for (const [command, options] of Object.entries(optionTooltips)) {
-      if (options[flag] && options[flag][type]) {
+      if (options[flag] &amp;&amp; options[flag][type]) {
         usages.push(`${options[flag][type]}`);
       }
     }
@@ -120,7 +148,7 @@ UnixFilters.onChange = function (context) {
         const block = context.blocklyHelper.workspace.getBlockById(
           event.blockId || event.newValue
         );
-        if (block && block.type.startsWith("option_")) {
+        if (block &amp;&amp; block.type.startsWith("option_")) {
           updateOptionBlockTooltips(context);
         }
       }
@@ -141,13 +169,13 @@ function updateOptionBlockTooltips(context) {
 
 function getDetailedTooltip(blockType) {
   const parts = blockType.split("_");
-  if (parts.length < 3) return "";
+  if (parts.length &lt; 3) return "";
   const flag = parts[1];
   const type = parts[2] === "flag" ? "flag" : "field_index";
 
   const usages = ["Utilisable avec :"];
   for (const [command, options] of Object.entries(optionTooltips)) {
-    if (options[flag] && options[flag][type]) {
+    if (options[flag] &amp;&amp; options[flag][type]) {
       usages.push(`${options[flag][type]}`);
     }
   }
@@ -310,7 +338,7 @@ UnixFilters.backToBeginning = function () {
  * @param {number} index - Index of the step to show
  */
 UnixFilters.showStep = function (index) {
-  if (!UnixFilters.stepData || index > UnixFilters.lastIndex || index < 0) {
+  if (!UnixFilters.stepData || index > UnixFilters.lastIndex || index &lt; 0) {
     return;
   }
   const step = UnixFilters.stepData[index];
@@ -412,3 +440,26 @@ const optionTooltips = {
     r: { flag: "sed : activer les expressions régulières étendues (ERE)" },
   },
 };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-blocklyUnixFilters_lib.html">blocklyUnixFilters_lib</a></li><li><a href="module-jsongenerator.html">jsongenerator</a></li><li><a href="module-unixfilters.html">unixfilters</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Jul 10 2025 13:34:51 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
