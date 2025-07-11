@@ -103,7 +103,7 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 
 ### Aide (pas à jour)
 
-- [Ajouter un bloc](./docs/lib_js/add_block.md)
+- [Ajouter un bloc](./docs/add_block.md)
 
 ## Librairie Python
 
@@ -115,4 +115,4 @@ PAS PAREIL QUAND LE BLOC EST UNE COMMANDE OU UN SYMBOLE
 
 ### Aide (pas à jour)
 
-- [Ajouter une commande](./docs/lib_py/add_command.md)
+- [Ajouter une commande](./docs/add_command.md)
