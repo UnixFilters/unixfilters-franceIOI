@@ -5,6 +5,10 @@ Ce projet a été réalisé pendant mon stage de troisième année de licence d'
 - le front en JavaScript qui utilise la libriarie Blockly de Google : [/public](public)
 - le back qui permet l'exécution des commandes Bash en Python en utilisant le module subprocess : [/python_lib](python_lib)
 
+## Documentation détaillée
+
+https://waningcrescendo.github.io/unixfilters-docs/
+
 ## Getting started
 
 Cloner le repo
