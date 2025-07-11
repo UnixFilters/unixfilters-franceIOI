@@ -26,6 +26,9 @@ UnixFilters.reset = function (taskInfos) {
  * Defines the display by creating the buttons and display areas for:
  * Executing commands, navigating through steps and displaying generated code, the current step, and output.
  *
+ * @example
+ * let a = Something.fn()
+ * console.log(a) // Return value of something
  * @function resetDisplay
  * @memberof module:unixfilters
  * @param {Object} context - The execution context, used when executing the command

@@ -3,12 +3,22 @@
     "include": ["public"],
     "exclude": ["public/bebras-modules"]
   },
-  "templates": {
-    "sort": false
-  },
+  "plugins": ["plugins/markdown"],
+
   "opts": {
-    "destination": "./docs",
+    "destination": "../documentation_unixfilters/docs/",
     "recurse": true,
-    "sort": false
+    "sort": false,
+    "template": "node_modules/clean-jsdoc-theme",
+    "theme_opts": {
+      "default_theme": "fallback-light"
+    }
+  },
+  "markdown": {
+    "hardwrap": false,
+    "idInHeadings": true
+  },
+  "theme_opts": {
+    "footer": "This is footer"
   }
 }
