@@ -41,8 +41,46 @@ UnixFilters.resetDisplay = function (context) {
   });
 };
 
+function findCommandParent(block) {
+  let current = block.getParent();
+  while (current && !optionTooltips[current.type]) {
+    current = current.getParent();
+  }
+  return current;
+}
+
 // Refreshes the tooltip of an option block based on its parent command block
-function getDynamicTooltip(blockType) {
+function refreshOptionTooltip(optionBlock) {
+  const parent = findCommandParent(optionBlock);
+  const blockType = optionBlock.type;
+  const parts = blockType.split("_");
+  const flagType = parts[2] === "flag" ? "flag" : "field_index";
+
+  if (parts.length < 3) return "";
+  const flag = parts[1];
+  if (
+    parent &&
+    optionTooltips[parent.type] &&
+    optionTooltips[parent.type][flag] &&
+    optionTooltips[parent.type][flag][flagType]
+  ) {
+    optionBlock.setTooltip(optionTooltips[parent.type][flag][flagType]);
+  } else if (
+    parent &&
+    (!optionTooltips[parent.type] ||
+      !optionTooltips[parent.type][flag] ||
+      !optionTooltips[parent.type][flag][flagType])
+  ) {
+    optionBlock.setTooltip(
+      "L'option -" + flag + " n'est pas compatible avec cette commande"
+    );
+  } else {
+    optionBlock.setTooltip("Option -" + flag);
+  }
+}
+
+// Refreshes the tooltip of an option block based on its parent command block
+function getDynamicTooltipForToolbox(blockType) {
   // Check if blocks are sorted into categories
   const groupByCategory = window.unixfilters_groupByCategory ?? false;
   // Get the type (flag/field_index) and the command name
@@ -52,7 +90,7 @@ function getDynamicTooltip(blockType) {
   const type = parts[2] === "flag" ? "flag" : "field_index";
   const commandName = parts[parts.length - 1];
 
-  // If the toolbox is organised in catgories, only show the tooltip specific to the option + command name
+  // If the toolbox is organised in categories, only show the tooltip specific to the option + command name
   if (groupByCategory) {
     for (const [command, options] of Object.entries(optionTooltips)) {
       if (command == commandName && options[flag] && options[flag][type]) {
@@ -60,16 +98,8 @@ function getDynamicTooltip(blockType) {
       }
     }
     return `Option -${flag}`;
-  }
-  // Else, show the commands which the option can be used with
-  else {
-    const usages = ["Utilisable avec :"];
-    for (const [command, options] of Object.entries(optionTooltips)) {
-      if (options[flag] && options[flag][type]) {
-        usages.push(`${options[flag][type]}`);
-      }
-    }
-    return usages.length ? usages.join("\n") : `Option -${flag}`;
+  } else {
+    return `Option -${flag}`;
   }
 }
 
@@ -101,23 +131,13 @@ UnixFilters.onChange = function (context) {
           event.blockId || event.newValue
         );
         if (block && block.type.startsWith("option_")) {
-          updateOptionBlockTooltips(context);
+          refreshOptionTooltip(block);
         }
       }
     });
     context._tooltipListenerRegistered = true;
   }
 };
-
-function updateOptionBlockTooltips(context) {
-  const blocks = context.blocklyHelper.workspace.getAllBlocks();
-  for (const block of blocks) {
-    if (block.type.startsWith("option_")) {
-      const newTooltip = getDetailedTooltip(block.type);
-      block.setTooltip(newTooltip);
-    }
-  }
-}
 
 function getDetailedTooltip(blockType) {
   const parts = blockType.split("_");
@@ -273,6 +293,7 @@ function getNoopTypeFromBlockType(blockType) {
 }
 
 const optionTooltips = {
+  cat: {},
   cut: {
     f: { field_index: "cut : sélectionner des champs spécifiques" },
     b: { field_index: "cut : sélectionner des octets spécifiques" },
@@ -286,10 +307,10 @@ const optionTooltips = {
     v: { flag: "grep : afficher les lignes qui ne contiennent pas le motif" },
     r: { flag: "grep : rechercher récursivement dans les sous-dossiers" },
     l: {
-      flag: "grep : afficher uniquement les noms des fichiers contenant une correspondance",
+      flag: "grep : afficher uniquement les noms des fichiers contenant le motif",
     },
     i: { flag: "grep : ignorer la casse" },
-    w: { flag: "grep : faire correspondre le motif comme un mot entier" },
+    w: { flag: "grep : recherche le motif comme mot entier" },
     n: {
       flag: "grep : afficher les numéros de ligne pour chaque correspondance",
     },
@@ -303,7 +324,7 @@ const optionTooltips = {
   },
   sort: {
     u: { flag: "sort : supprimer les lignes dupliquées" },
-    n: { flag: "sort : trier selon une valeur numérique" },
+    n: { flag: "sort : trier par valeur numérique" },
     r: { flag: "sort : trier dans l’ordre inverse" },
     k: { field_index: "sort : trier selon une colonne spécifique" },
   },
@@ -318,16 +339,16 @@ const optionTooltips = {
   },
   tr: {
     d: { flag: "tr : supprimer les caractères spécifiés" },
-    s: { flag: "tr : remplacer les occurrences répétées par une seule" },
+    s: { flag: "tr : remplacer les répétitions consécutives par une seule" },
   },
   uniq: {
     c: { flag: "uniq : afficher le nombre d’occurrences de chaque ligne" },
   },
   wc: {
-    c: { flag: "wc : nombre de bytes (octets)" },
-    m: { flag: "wc : nombre de caractères" },
-    w: { flag: "wc : nombre de mots" },
-    l: { flag: "wc : nombre de lignes" },
+    c: { flag: "wc : compter le nombre de bytes (octets)" },
+    m: { flag: "wc : compter le nombre de caractères" },
+    w: { flag: "wc : compter le nombre de mots" },
+    l: { flag: "wc : compter le nombre de lignes" },
   },
   sed: {
     i: { flag: "sed : modifier les fichiers en place (sans redirection)" },

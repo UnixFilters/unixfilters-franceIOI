@@ -5,7 +5,7 @@ import os, subprocess, json
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 
-PATH_BASE = "../../../../../../UnixFilters/Exemple/tests"
+PATH_BASE = "../../../../../../UnixFilters/exemple_checker/tests"
 PATH_GEN = os.path.join(PATH_BASE, "gen")
 PATH_FILES = os.path.join(PATH_BASE, "files")
 

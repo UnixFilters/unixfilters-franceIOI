@@ -223,9 +223,24 @@ var getContext = function (display, infos, curLevel) {
 
   // Array defining symbol name and colour
   const SYMBOL_NAMES = [
-    { name: "symbol_greater_than", colour: 25 },
-    { name: "symbol_even_greater_than", colour: 90 },
-    { name: "symbol_less_than", colour: 50 },
+    {
+      name: "symbol_greater_than",
+      colour: 25,
+      tooltip:
+        "redirige le flux de sortie de la commande pour la placer dans un fichier",
+    },
+    {
+      name: "symbol_even_greater_than",
+      colour: 90,
+      tooltip:
+        "redirige le flux de sortie de la commande pour l’ajouter à la fin d’un fichier existant",
+    },
+    {
+      name: "symbol_less_than",
+      colour: 50,
+      tooltip:
+        "redirige le flux d'entrée de la commande pour la prendre dans un fichier",
+    },
   ];
 
   // Array defining noop name and colour
@@ -242,7 +257,7 @@ var getContext = function (display, infos, curLevel) {
       name: "grep",
       colour: 285,
       tooltip:
-        "Permet de rechercher un motif dans un fichier.\ngrep pattern [options] [FICHIER] ",
+        "Permet de rechercher un motif dans un fichier.\n Usage : grep pattern [options] fichier ",
       args0: [
         {
           type: "field_input",
@@ -353,7 +368,7 @@ var getContext = function (display, infos, curLevel) {
     const fullBlock = {
       init: function () {
         this.jsonInit(blocklyJson);
-        const tooltip = getDynamicTooltip(this.type);
+        const tooltip = getDynamicTooltipForToolbox(this.type);
         this.setTooltip(tooltip);
       },
     };
@@ -376,7 +391,7 @@ var getContext = function (display, infos, curLevel) {
       const block = {
         name: command.commandName,
         blocklyJson: {
-          tooltip: command.tooltip + "\n" + command.format,
+          tooltip: command.tooltip + "\n Usage : " + command.format,
           colour: 285,
           args0: [
             {
@@ -422,6 +437,7 @@ var getContext = function (display, infos, curLevel) {
       context.customBlocks.unixfilters.symbols.push({
         name: symbol.name,
         blocklyJson: {
+          tooltip: symbol.tooltip,
           colour: symbol.colour,
           args0: [
             {
