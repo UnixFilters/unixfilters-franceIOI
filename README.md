@@ -66,7 +66,7 @@ node server.js
 
 URL en développement : http://localhost:3000
 
-#### Tester une tâche localement
+#### Tester une tâche localement (pas à jour)
 
 1. Générer un code Blockly depuis l'interface
 
@@ -87,7 +87,7 @@ python3 tests/gen/commands.py < tests/files/test01.in > tests/files/test01.solou
 python3 tests/gen/checker.py tests/files/test01.solout tests/files/test01.in tests/files/test01.out
 ```
 
-### Production
+### Production (pas à jour)
 
 Envoyer les fichiers sur le SVN (on verra plus tard)
 
@@ -101,7 +101,7 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 ├── task.js --> contient les paramètres de la tâche (blocs disponibles, nombre de blocs autorisés,...)\
 └── unixfilters.js --> logique de l'affichage et de l'envoi de la commande au serveur
 
-### Aide
+### Aide (pas à jour)
 
 - [Ajouter un bloc](./docs/lib_js/add_block.md)
 
@@ -113,6 +113,6 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 
 PAS PAREIL QUAND LE BLOC EST UNE COMMANDE OU UN SYMBOLE
 
-### Aide
+### Aide (pas à jour)
 
 - [Ajouter une commande](./docs/lib_py/add_command.md)
