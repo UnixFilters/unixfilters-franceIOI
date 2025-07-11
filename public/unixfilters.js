@@ -1,15 +1,38 @@
+/**
+ * @file blocklyUnixFilters_lib.js
+ * @description Functions related to Blockly blocks for Unix filters.
+ * @module unixfilters
+ */
+
 var UnixFilters = {
   functions: {},
   currentOutput: null,
   pipedOutput: false,
 };
 
+/**
+ * Resets the internal output state of UnixFilters.
+ *
+ * @function reset
+ * @memberof module:unixfilters
+ * @param {Object} taskInfos - Information about the task context (currently unused)
+ */
 UnixFilters.reset = function (taskInfos) {
   UnixFilters.currentOutput = null;
   UnixFilters.pipedOutput = false;
 };
 
-// Define the display
+/**
+ * Defines the display by creating the buttons and display areas for:
+ * Executing commands, navigating through steps and displaying generated code, the current step, and output.
+ *
+ * @example
+ * let a = Something.fn()
+ * console.log(a) // Return value of something
+ * @function resetDisplay
+ * @memberof module:unixfilters
+ * @param {Object} context - The execution context, used when executing the command
+ */
 UnixFilters.resetDisplay = function (context) {
   const groupByCategory = context.blocklyHelper.includeBlocks.groupByCategory;
   window.unixfilters_groupByCategory = groupByCategory;
@@ -155,7 +178,13 @@ function getDetailedTooltip(blockType) {
   return usages.length > 1 ? usages.join("\n") : `Option -${flag}`;
 }
 
-// Fills empty input fields with no-op blocks
+/**
+ * Fills empty input fields (PARAM_0) with no-op blocks if they are not connected.
+ *
+ * @function fillEmptyOptionInputs
+ * @memberof module:unixfilters
+ * @param {Object} context - The Blockly execution context
+ */
 UnixFilters.fillEmptyOptionInputs = function (context) {
   const allBlocks = context.blocklyHelper.workspace.getAllBlocks(false);
   for (const block of allBlocks) {
@@ -174,7 +203,13 @@ UnixFilters.fillEmptyOptionInputs = function (context) {
   }
 };
 
-// Removes no-op blocks
+/**
+ * Removes all no-op blocks from the workspace.
+ *
+ * @function removeNoops
+ * @memberof module:unixfilters
+ * @param {Object} context - The Blockly execution context
+ */
 UnixFilters.removeNoops = function (context) {
   context.blocklyHelper.workspace.getAllBlocks().forEach(function (block) {
     if (block.type.startsWith("noop")) {
@@ -183,6 +218,13 @@ UnixFilters.removeNoops = function (context) {
   });
 };
 
+/**
+ * Sends generated Python code to the backend server for execution.
+ *
+ * @async
+ * @function sendCommandToServer
+ * @memberof module:unixfilters
+ */
 UnixFilters.sendCommandToServer = async function () {
   try {
     let pythonCode = task.displayedSubTask.blocklyHelper
@@ -231,13 +273,25 @@ function updateScore(score) {
   $("#score").text("Score : " + score);
 }
 
-// Parses the JSON data returned and prepares the steps
+/**
+ * Parses JSON data from the server into internal step functions.
+ *
+ * @function parseJson
+ * @memberof module:unixfilters
+ * @param {Object} jsonData - The response from the server containing command steps
+ */
 UnixFilters.parseJson = function (jsonData) {
   UnixFilters.stepData = Object.values(jsonData.steps);
   UnixFilters.currentIndex = 0;
   UnixFilters.lastIndex = Object.values(jsonData.steps).length - 1;
 };
 
+/**
+ * Moves to the next step in the parsed JSON steps.
+ *
+ * @function nextStep
+ * @memberof module:unixfilters
+ */
 UnixFilters.nextStep = function () {
   if (
     !UnixFilters.stepData ||
@@ -249,16 +303,35 @@ UnixFilters.nextStep = function () {
   UnixFilters.showStep(UnixFilters.currentIndex);
 };
 
+/**
+ * Skips to the final step in the parsed JSON steps.
+ *
+ * @function end
+ * @memberof module:unixfilters
+ */
 UnixFilters.end = function () {
   UnixFilters.showStep(UnixFilters.lastIndex);
   UnixFilters.currentIndex = UnixFilters.lastIndex;
 };
 
+/**
+ * Resets to the beginning of the parsed JSON steps.
+ *
+ * @function backToBeginning
+ * @memberof module:unixfilters
+ */
 UnixFilters.backToBeginning = function () {
   UnixFilters.showStep(0);
   UnixFilters.currentIndex = 0;
 };
 
+/**
+ * Displays a specific step in the parsed command steps.
+ *
+ * @function showStep
+ * @memberof module:unixfilters
+ * @param {number} index - Index of the step to show
+ */
 UnixFilters.showStep = function (index) {
   if (!UnixFilters.stepData || index > UnixFilters.lastIndex || index < 0) {
     return;
@@ -280,7 +353,14 @@ UnixFilters.showStep = function (index) {
   }
 };
 
-// Utility function to determine the type of no-op block to create based on the block type
+/**
+ * Determines the correct no-op block type based on the block type.
+ *
+ * @function getNoopTypeFromBlockType
+ * @private
+ * @param {string} blockType - The type of the original block.
+ * @returns {string} The corresponding no-op block type.
+ */
 function getNoopTypeFromBlockType(blockType) {
   if (blockType.includes("_flag")) {
     return "noop_option_flag";

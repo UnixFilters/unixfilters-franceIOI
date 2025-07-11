@@ -1,3 +1,9 @@
+/**
+ * @file jsongenerator.js
+ * @description Contains functions handling the JSON generation.
+ * @module jsongenerator
+ */
+
 var jsonGenerator = new Blockly.Generator("JSON");
 
 jsonGenerator.ORDER_ATOMIC = 0;
@@ -80,6 +86,15 @@ function removeEventualQuotes(value) {
   }
 }
 
+/**
+ *
+ * @function
+ * @memberof module:jsongenerator
+ * @param {Object} block
+ * @param {string} fieldname
+ * @param {boolean} isForLibrary
+ * @returns {string}
+ */
 function getFieldValue(block, fieldname, isForLibrary) {
   const value = block.getFieldValue(fieldname).trim();
   return isForLibrary ? removeEventualQuotes(value) : value;

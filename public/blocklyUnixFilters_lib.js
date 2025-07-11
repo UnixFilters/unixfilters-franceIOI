@@ -1,3 +1,9 @@
+/**
+ * @file blocklyUnixFilters_lib.js
+ * @description Functions defining the blocks for Unix filters.
+ * @module blocklyUnixFilters_lib
+ */
+
 // This is a unixfilters of library for use with quickAlgo.
 
 var getContext = function (display, infos, curLevel) {
@@ -251,6 +257,12 @@ var getContext = function (display, infos, curLevel) {
     { name: "noop_text", colour: 165 },
   ];
 
+  /**
+   * Creates a grep block definition.
+   * @function makeGrepBlock
+   * @memberof module:blocklyUnixFilters_lib
+   * @returns {Object} Block definition for grep
+   */
   function makeGrepBlock() {
     // Function to make a grep block
     var blockJson = {
@@ -303,7 +315,13 @@ var getContext = function (display, infos, curLevel) {
     context.customBlocks.unixfilters["grep"].push(block);
   }
 
-  // Generates code for a command using the extracted options and/or filename
+  /**
+   * Generates code for a command block using the extracted options
+   * @param {string} commandName - Name of the command
+   * @param {Object} block - Blockly block instance
+   * @param {string} lang - Language identifier ("Python" or "JavaScript")
+   * @returns {string} The generated code
+   */
   function generateCodeForCommand(commandName, block, lang) {
     // lang is not used because we generate the same code for both Python and JavaScript
     const paramBlock = block.getInputTargetBlock("PARAM_0");
@@ -311,7 +329,10 @@ var getContext = function (display, infos, curLevel) {
     return `${commandName}(${JSON.stringify(args)})\n`;
   }
 
-  // Creates an option block based on its type (flag or field_index)
+  /**
+   * Creates option blocks based on their type (flag or field index).
+   * @param {Object} optionObject - Option object with flag and type
+   */
   function makeOptionBlock(flag, type = "flag") {
     const blockName = `option_${flag}_${type}`;
 
@@ -385,7 +406,13 @@ var getContext = function (display, infos, curLevel) {
     };
   }
 
-  // Creates a block for a Unix command (grep, sort,...)
+  /**
+   * Creates command block for each object in Array.
+   * @function makeCommandBlock
+   * @memberof module:blocklyUnixFilters_lib
+   * @param {Array} commandArray - Array of command block definitions
+   * @returns {void}
+   */
   function makeCommandBlock(commandArray) {
     commandArray.forEach((command) => {
       const block = {
@@ -416,7 +443,12 @@ var getContext = function (display, infos, curLevel) {
     });
   }
 
-  // Creates a "noop" (no-operation) block (placeholder block with no behavior)
+  /**
+   * Creates noop blocks with a specified color.
+   * @function makeNoopBlock
+   * @memberof module:blocklyUnixFilters_lib
+   * @param {Array} noopArray - Array of noop block definitions
+   */
   function makeNoopBlock(noopArray) {
     noopArray.forEach((noop) => {
       context.customBlocks.unixfilters.commands.push({
@@ -431,7 +463,12 @@ var getContext = function (display, infos, curLevel) {
     });
   }
 
-  // Creates a symbol block (>,>>,<)
+  /**
+   * Creates symbol blocks with a specified color.
+   * @function makeSymbolBlock
+   * @memberof module:blocklyUnixFilters_lib
+   * @param {Array} symbolArray - Array of symbol block definitions
+   */
   function makeSymbolBlock(symbolArray) {
     symbolArray.forEach((symbol) => {
       context.customBlocks.unixfilters.symbols.push({
