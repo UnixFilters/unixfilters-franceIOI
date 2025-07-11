@@ -65,6 +65,15 @@ function refreshOptionTooltip(optionBlock) {
     optionTooltips[parent.type][flag][flagType]
   ) {
     optionBlock.setTooltip(optionTooltips[parent.type][flag][flagType]);
+  } else if (
+    parent &&
+    (!optionTooltips[parent.type] ||
+      !optionTooltips[parent.type][flag] ||
+      !optionTooltips[parent.type][flag][flagType])
+  ) {
+    optionBlock.setTooltip(
+      "L'option -" + flag + " n'est pas compatible avec cette commande"
+    );
   } else {
     optionBlock.setTooltip("Option -" + flag);
   }
@@ -284,6 +293,7 @@ function getNoopTypeFromBlockType(blockType) {
 }
 
 const optionTooltips = {
+  cat: {},
   cut: {
     f: { field_index: "cut : sélectionner des champs spécifiques" },
     b: { field_index: "cut : sélectionner des octets spécifiques" },
@@ -297,10 +307,10 @@ const optionTooltips = {
     v: { flag: "grep : afficher les lignes qui ne contiennent pas le motif" },
     r: { flag: "grep : rechercher récursivement dans les sous-dossiers" },
     l: {
-      flag: "grep : afficher uniquement les noms des fichiers contenant une correspondance",
+      flag: "grep : afficher uniquement les noms des fichiers contenant le motif",
     },
     i: { flag: "grep : ignorer la casse" },
-    w: { flag: "grep : faire correspondre le motif comme un mot entier" },
+    w: { flag: "grep : recherche le motif comme mot entier" },
     n: {
       flag: "grep : afficher les numéros de ligne pour chaque correspondance",
     },
@@ -314,7 +324,7 @@ const optionTooltips = {
   },
   sort: {
     u: { flag: "sort : supprimer les lignes dupliquées" },
-    n: { flag: "sort : trier selon une valeur numérique" },
+    n: { flag: "sort : trier par valeur numérique" },
     r: { flag: "sort : trier dans l’ordre inverse" },
     k: { field_index: "sort : trier selon une colonne spécifique" },
   },
@@ -329,16 +339,16 @@ const optionTooltips = {
   },
   tr: {
     d: { flag: "tr : supprimer les caractères spécifiés" },
-    s: { flag: "tr : remplacer les occurrences répétées par une seule" },
+    s: { flag: "tr : remplacer les répétitions consécutives par une seule" },
   },
   uniq: {
     c: { flag: "uniq : afficher le nombre d’occurrences de chaque ligne" },
   },
   wc: {
-    c: { flag: "wc : nombre de bytes (octets)" },
-    m: { flag: "wc : nombre de caractères" },
-    w: { flag: "wc : nombre de mots" },
-    l: { flag: "wc : nombre de lignes" },
+    c: { flag: "wc : compter le nombre de bytes (octets)" },
+    m: { flag: "wc : compter le nombre de caractères" },
+    w: { flag: "wc : compter le nombre de mots" },
+    l: { flag: "wc : compter le nombre de lignes" },
   },
   sed: {
     i: { flag: "sed : modifier les fichiers en place (sans redirection)" },
