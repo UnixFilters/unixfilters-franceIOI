@@ -85,10 +85,10 @@ Ce fichier représente les données que la commande Unix doit manipuler dans l�
 
 La vérification se fait dans le checker, à l’aide de plusieurs fichiers :
 
-Dans le checker, dans le fichier [`test01.solout`](https://github.com/UnixFilters/checker/blob/main/exemple_checker/tests/files/test01.out), ajouter la solution attendue par l'exercice. Par exemple, pour un exercice attendant un cat du fichier, mettre le contenu du fichier manioulé dans test01.solout.
+Dans le checker, dans le fichier [`test01.out`](https://github.com/UnixFilters/checker/blob/main/exemple_checker/tests/files/test01.out), ajouter la solution attendue par l'exercice. Par exemple, pour un exercice attendant un cat du fichier, mettre le contenu du fichier manioulé dans test01.out.
 
 ### Exemple
 
-Si l’utilisateur doit exécuter `cat monfichier.txt`, placez le contenu attendu de ce fichier dans `test01.solout`.
+Si l’utilisateur doit exécuter `cat monfichier.txt`, placez le contenu attendu de ce fichier dans `test01.out`.
 
 Le fichier [`checker.py`](https://github.com/UnixFilters/checker/blob/main/exemple_checker/tests/gen/checker.py) compare ensuite le résultat obtenu en exécutant le code généré par les blocs et la solution dans test01.solout, en enlevant les espaces et retour à la ligne, et renvoie un objet. Pour en savoir plus, consultez la [documentation du checker]()
