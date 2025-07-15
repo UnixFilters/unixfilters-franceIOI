@@ -33,7 +33,7 @@ function initTask(subTask) {
   };
 }
 ```
-
+(ajouter la liste des noms de blocs valides)
 ### `groupByCategory`
 
 L'option groupByCategory indique si les blocs sont affichés groupés par type de commande ou en vrac :
