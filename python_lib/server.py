@@ -26,7 +26,7 @@ def save_solution():
         # python3 commands.py < ../files/test01.in > ../files/test01.solout
         with open(path_input, "r") as fin, open(path_solout, "w") as fout:
             subprocess.run(
-                ["python3", "commands.py"],
+                ["python3", path_commands],
                 stdin=fin,
                 stdout=fout,
                 check=True,
