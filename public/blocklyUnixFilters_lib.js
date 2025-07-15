@@ -60,12 +60,6 @@ var getContext = function (display, infos, curLevel) {
       },
       description: {
         // Descriptions of the functions in Python (optional)
-        cat: "cat file.txt : affiche le contenu du fichier file.txt",
-        grep: "grep 'mot' : affiche les lignes d'entrée contenant le mot 'mot'",
-        sort: "sort : affiche les lignes triées du fichier (par défaut ordre alphabétique)",
-        uniq: "uniq : affiche les lignes en supprimant les multiples occurrences consécutives d'une même ligne",
-        head: "head",
-        //   pipe: "pipe : redirige la sortie d'une commande vers une autre commande",
       },
       constant: {},
       startingBlockName: "Ligne de commande", // Name for the starting block

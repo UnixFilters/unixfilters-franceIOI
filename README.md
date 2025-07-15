@@ -100,33 +100,9 @@ node server.js
 
 URL en développement : http://localhost:3000
 
-#### Tester une tâche localement (pas à jour)
-
-1. Générer un code Blockly depuis l'interface
-
-2. Copier le code généré par les blocs dans solutoon.py
-   (maintenant : Lors du clic sur le bouton **_Exécuter_**, le code est enregistré dans tests/gen/solution.py)
-   Exemple :
-
-```python
-cut(["-d", " ", "-f", "2,4", "commandes.txt"])
-sort(["-t", "' '", "-k", "2,2nr"])
-head(["-n", "5"])
-```
-
-3. Lancer le test :
-
-```bash
-python3 tests/gen/commands.py < tests/files/test01.in > tests/files/test01.solout
-python3 tests/gen/checker.py tests/files/test01.solout tests/files/test01.in tests/files/test01.out
-```
-
-### Production (pas à jour)
-
-Envoyer les fichiers sur le SVN (on verra plus tard)
-
 ## Interface Blockly/JavaScript
 
+[Voir l'aide](./docs/add_block.md)
 .\
 ├── blocklyUnixFilters_lib.js --> librairie contenant la définition des blocs\
 ├── index.css --> style de la page html\
@@ -135,16 +111,10 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 ├── task.js --> contient les paramètres de la tâche (blocs disponibles, nombre de blocs autorisés,...)\
 └── unixfilters.js --> logique de l'affichage et de l'envoi de la commande au serveur
 
-### Aide (pas à jour)
-
-- [Ajouter un bloc](./docs/add_block.md)
-
 ## Librairie Python
+
+[Voir l'aide](./docs/add_lib.md)
 
 .\
 ├── commands.py --> librairie définissant les différents filtres et exécutant la commande\
 └── server.py --> reçoit le code généré par les blocs et utilise la librairie pour récupérer le résultat et le renvoyer au front
-
-### Aide (pas à jour)
-
-- [Ajouter une commande](./docs/add_command.md)
