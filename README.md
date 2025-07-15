@@ -58,11 +58,41 @@ pip install flask-cors
 python3 server.py
 ```
 
-Installer les dépendances et lancer le serveur node à la racine unixfilters-franceIOI
+### Installer Node.js
+
+Dans un autre terminal
+
+#### Sur **Linux** (Debian/Ubuntu) :
+
+```bash
+sudo apt update
+sudo apt install nodejs npm
+```
+
+#### Sur **macOS** :
+
+```bash
+brew install node
+```
+
+#### Sur **Windows** :
+
+Télécharger et installer Node.js depuis [le site officiel](https://nodejs.org/).\
+
+Vérifier l'installation :
+
+```bash
+node -v
+npm -v
+```
+
+Installer les dépendances
 
 ```bash
 npm install
 ```
+
+À la racine du projet, lancer le serveur node
 
 ```bash
 node server.js
@@ -114,8 +144,6 @@ Envoyer les fichiers sur le SVN (on verra plus tard)
 .\
 ├── commands.py --> librairie définissant les différents filtres et exécutant la commande\
 └── server.py --> reçoit le code généré par les blocs et utilise la librairie pour récupérer le résultat et le renvoyer au front
-
-PAS PAREIL QUAND LE BLOC EST UNE COMMANDE OU UN SYMBOLE
 
 ### Aide (pas à jour)
 

@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["public"],
+    "include": ["public", "README.md", "docs"],
     "exclude": ["public/bebras-modules"]
   },
   "plugins": ["plugins/markdown"],
@@ -8,17 +8,19 @@
   "opts": {
     "destination": "../documentation_unixfilters/docs/",
     "recurse": true,
-    "sort": false,
+    "readme": "./README.md",
     "template": "node_modules/clean-jsdoc-theme",
     "theme_opts": {
-      "default_theme": "fallback-light"
+      "default_theme": "fallback-light",
+      "home": "./README.md",
+      "favicon": "path",
+      "sort": false,
+      "homepageTitle": "Documentation Unix Filters",
+      "footer": "Version 1.0 | Documentation générée automatiquement"
     }
   },
   "markdown": {
     "hardwrap": false,
     "idInHeadings": true
-  },
-  "theme_opts": {
-    "footer": "This is footer"
   }
 }
