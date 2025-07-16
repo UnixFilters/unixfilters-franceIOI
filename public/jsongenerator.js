@@ -9,6 +9,14 @@ var jsonGenerator = new Blockly.Generator("JSON");
 jsonGenerator.ORDER_ATOMIC = 0;
 jsonGenerator.ORDER_NONE = 0;
 
+/**
+ * Cleans up a generated block's code by removing comments.
+ * @function
+ * @memberof module:jsongenerator
+ * @param {Blockly.Block} block - The block to scrub
+ * @param {string} code - The generated code for the block
+ * @returns {string} Cleaned code
+ */
 jsonGenerator.scrub_ = function (block, code) {
   // Strip comments.
   const commentCode = this.scrubNakedValue(block.getCommentText()) || "";
@@ -16,6 +24,13 @@ jsonGenerator.scrub_ = function (block, code) {
   return codeWithComments;
 };
 
+/**
+ * Removes inline comments from a string line.
+ * @function
+ * @memberof module:jsongenerator
+ * @param {string} line - A line of code
+ * @returns {string} The line without inline comments
+ */
 jsonGenerator.scrubNakedValue = function (line) {
   // Strip single line comments.
   const commentIndex = line.indexOf("//");
@@ -29,6 +44,13 @@ jsonGenerator.robot_start = function (block) {
   return "";
 };
 
+/**
+ * Creates a generator function for a shell command.
+ * @function
+ * @memberof module:jsongenerator
+ * @param {string} commandName - Name of the shell command.
+ * @returns {function(Blockly.Block): string} A generator function for the command.
+ */
 function makeCommandGenerator(commandName) {
   return function (block) {
     const paramBloc = block.getInputTargetBlock("PARAM_0") || null;
@@ -50,6 +72,13 @@ jsonGenerator.uniq = makeCommandGenerator("uniq");
 jsonGenerator.wc = makeCommandGenerator("wc");
 jsonGenerator.sed = makeCommandGenerator("sed");
 
+/**
+ * Generates grep command with options and pattern.
+ * @function
+ * @memberof module:jsongenerator
+ * @param {Blockly.Block} block - The grep block.
+ * @returns {string} The generated grep command.
+ */
 jsonGenerator.grep = function (block) {
   const pattern = block.getFieldValue("PARAM_1");
   const optionBlock = block.getInputTargetBlock("PARAM_0");
@@ -58,6 +87,13 @@ jsonGenerator.grep = function (block) {
   return `grep ${pattern} ${optionString} `;
 };
 
+/**
+ * Returns the text value from a text input block.
+ * @function
+ * @memberof module:jsongenerator
+ * @param {Blockly.Block} block - The block containing text.
+ * @returns {string} The text value.
+ */
 jsonGenerator.text_input = function (block) {
   const text = block.getFieldValue("PARAM_1");
   return `${text}`;
@@ -75,6 +111,12 @@ jsonGenerator.symbol_less_than = function () {
   return `<`;
 };
 
+/**
+ * Removes quotes from a string if they are valid
+ * @function
+ * @param {string} value - The string to clean
+ * @returns {string} The cleaned string
+ */
 function removeEventualQuotes(value) {
   if (
     (value.length >= 2 && value.startsWith("'") && value.endsWith("'")) ||
@@ -87,19 +129,26 @@ function removeEventualQuotes(value) {
 }
 
 /**
- *
+ * Gets the value from a block's field, optionally cleaning quotes for library export.
  * @function
  * @memberof module:jsongenerator
- * @param {Object} block
- * @param {string} fieldname
- * @param {boolean} isForLibrary
- * @returns {string}
+ * @param {Blockly.Block} block - The block
+ * @param {string} fieldname - The field name
+ * @param {boolean} isForLibrary - Whether to clean quotes
+ * @returns {string} The field value
  */
 function getFieldValue(block, fieldname, isForLibrary) {
   const value = block.getFieldValue(fieldname).trim();
   return isForLibrary ? removeEventualQuotes(value) : value;
 }
 
+/**
+ * Extracts command-line arguments from a chain of connected blocks.
+ * @function
+ * @param {Blockly.Block} chainedBlock - The starting block of the chain
+ * @param {boolean} isForLibrary - Whether to clean the output for library use
+ * @returns {string[]} Array of arguments
+ */
 function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
   const args = [];
   let current = chainedBlock;
@@ -151,6 +200,13 @@ function extractChainedBlocksForCodeSentToLib(chainedBlock) {
   return extractChainedBlocksForCode(chainedBlock, true);
 }
 
+/**
+ * Generates code by traversing blocks connected to robor_start block
+ * @function
+ * @memberof module:jsongenerator
+ * @param {Blockly.Block} block - The starting block
+ * @returns {string} The generated code
+ */
 jsonGenerator.robot_start = function (block) {
   let code = "";
   let child = block.getNextBlock();

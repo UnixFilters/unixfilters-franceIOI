@@ -168,6 +168,11 @@ var getContext = function (display, infos, curLevel) {
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
    */
 
+  /**
+   * List of commands with tooltips and format use
+   * @constant
+   * @type {Array<{commandName: string, tooltip: string, format: string}>}
+   */
   const COMMANDS = [
     {
       commandName: "cat",
@@ -221,7 +226,11 @@ var getContext = function (display, infos, curLevel) {
     },
   ];
 
-  // Array defining symbol name and colour
+  /**
+   * List of symbols used for redirection
+   * @constant
+   * @type {Array<{name: string, colour: number, tooltip: string}>}
+   */
   const SYMBOL_NAMES = [
     {
       name: "symbol_greater_than",
@@ -243,7 +252,11 @@ var getContext = function (display, infos, curLevel) {
     },
   ];
 
-  // Array defining noop name and colour
+  /**
+   * List of noop (no operation) blocks used for placeholders
+   * @constant
+   * @type {Array<{name: string, colour: number}>}
+   */
   const NOOP_NAMES = [
     { name: "noop_option_flag", colour: 225 },
     { name: "noop_option_field_index", colour: 200 },

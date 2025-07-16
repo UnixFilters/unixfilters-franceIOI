@@ -6,7 +6,7 @@
   "plugins": ["plugins/markdown"],
 
   "opts": {
-    "destination": "../documentation_unixfilters/docs/",
+    "destination": "../documentation_unixfilters/docs/jsdoc/",
     "recurse": true,
     "readme": "./docs/README.md",
     "template": "node_modules/clean-jsdoc-theme",
