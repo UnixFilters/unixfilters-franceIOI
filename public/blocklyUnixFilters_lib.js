@@ -458,7 +458,7 @@ var getContext = function (display, infos, curLevel) {
    */
   function makeNoopBlock(noopArray) {
     noopArray.forEach((noop) => {
-      context.customBlocks.unixfilters.commands.push({
+      context.customBlocks.unixfilters.noop.push({
         name: noop.name,
         blocklyJson: {
           colour: noop.colour,
@@ -520,7 +520,7 @@ var getContext = function (display, infos, curLevel) {
           },
         },
       ],
-      commands: [],
+      noop: [],
       symbols: [],
     },
   };

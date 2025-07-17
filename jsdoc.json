@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["public", "docs"],
+    "include": ["public"],
     "exclude": ["public/bebras-modules"]
   },
   "plugins": ["plugins/markdown"],
@@ -8,11 +8,9 @@
   "opts": {
     "destination": "../documentation_unixfilters/docs/jsdoc/",
     "recurse": true,
-    "readme": "./docs/README.md",
     "template": "node_modules/clean-jsdoc-theme",
     "theme_opts": {
       "default_theme": "fallback-light",
-      "home": "./docs/README.md",
       "favicon": "path",
       "sort": false,
       "homepageTitle": "Documentation Unix Filters",
