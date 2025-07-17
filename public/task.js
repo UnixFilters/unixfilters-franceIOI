@@ -62,34 +62,16 @@ function initTask(subTask) {
           // UNIQ
           "option_c_flag_uniq_lower",
 
-          // WC
-          "option_c_flag_wc_lower",
-          "option_l_flag_wc_lower",
-          "option_m_flag_wc_lower",
-          "option_w_flag_wc_lower",
-
           // SED
           "option_i_flag_sed_lower",
           "option_n_flag_sed_lower",
           "option_r_flag_sed_lower",
 
-          // "option_i_flag",
-          // "option_n_flag",
-          // "option_c_flag",
-          // "option_r_flag",
-          // "option_u_flag",
-          // "option_n_field_index",
-          // "option_k_field_index",
-          // "option_c_field_index",
-          // "option_d_field_index",
-          // // "option_t_field_index",
-          // "option_f_field_index",
-          // "option_b_field_index",
-          // "option_a_flag",
-          // "option_d_flag",
-          // "option_l_flag",
-          // "option_w_flag",
-          // "option_m_flag",
+          // WC
+          "option_c_flag_wc_lower",
+          "option_l_flag_wc_lower",
+          "option_m_flag_wc_lower",
+          "option_w_flag_wc_lower",
         ],
       },
       singleBlocks: ["text"],
