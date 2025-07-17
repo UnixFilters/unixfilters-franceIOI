@@ -340,9 +340,8 @@ var getContext = function (display, infos, curLevel) {
    * Creates option blocks based on their type (flag or field index).
    * @param {Object} optionObject - Option object with flag and type
    */
-  function makeOptionBlock(flag, type = "flag") {
+  function makeOptionBlock(flag, type = "flag", caseType) {
     const blockName = `option_${flag}_${type}`;
-
     // Get the list of commands compatible with this flag and type
     const compatibleCommands = Object.entries(optionTooltips)
       .filter(([_, flags]) => flags[flag] && flags[flag][type])
@@ -354,12 +353,16 @@ var getContext = function (display, infos, curLevel) {
       output: "null",
     };
 
+    generatedFlag = flag;
+    if (caseType == "upper") {
+      generatedFlag = flag.toUpperCase();
+    }
     // COnfigure block layout based on the option type
     switch (type) {
       case "flag":
         blocklyJson = {
           ...blocklyJson,
-          message0: `-${flag} %1`,
+          message0: `-${generatedFlag} %1`,
           args0: [
             {
               type: "input_value",
@@ -403,7 +406,7 @@ var getContext = function (display, infos, curLevel) {
 
     for (cde of compatibleCommands) {
       context.customBlocks.unixfilters[cde].push({
-        name: blockName + "_" + cde,
+        name: blockName + "_" + cde + "_" + caseType,
         blocklyJson,
         fullBlock,
       });
@@ -530,7 +533,8 @@ var getContext = function (display, infos, curLevel) {
   Object.entries(optionTooltips).forEach(([command, options]) => {
     Object.entries(options).forEach(([key, data]) => {
       const labelType = data.flag ? "flag" : "field_index";
-      makeOptionBlock(key, labelType);
+      const caseType = data.case;
+      makeOptionBlock(key, labelType, caseType);
     });
   });
 

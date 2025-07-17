@@ -23,54 +23,55 @@ function initTask(subTask) {
           "uniq",
           "wc",
           // CUT
-          "option_b_field_index_cut",
-          "option_c_field_index_cut",
-          "option_d_field_index_cut",
-          "option_f_field_index_cut",
+          "option_b_field_index_cut_lower",
+          "option_c_field_index_cut_lower",
+          "option_d_field_index_cut_lower",
+          "option_f_field_index_cut_lower",
 
           // GREP
-          "option_c_flag_grep",
-          "option_i_flag_grep",
-          "option_l_flag_grep",
-          "option_n_flag_grep",
-          "option_r_flag_grep",
-          "option_v_flag_grep",
-          "option_w_flag_grep",
+          "option_c_flag_grep_lower",
+          "option_i_flag_grep_lower",
+          "option_l_flag_grep_lower",
+          "option_n_flag_grep_lower",
+          "option_r_flag_grep_lower",
+          "option_v_flag_grep_lower",
+          "option_w_flag_grep_lower",
+          "option_f_flag_grep_upper",
 
           // HEAD
-          "option_c_field_index_head",
-          "option_n_field_index_head",
+          "option_c_field_index_head_lower",
+          "option_n_field_index_head_lower",
 
           // SORT
-          "option_k_field_index_sort",
-          "option_n_flag_sort",
-          "option_r_flag_sort",
-          "option_u_flag_sort",
+          "option_k_field_index_sort_lower",
+          "option_n_flag_sort_lower",
+          "option_r_flag_sort_lower",
+          "option_u_flag_sort_lower",
 
           // TAIL
-          "option_c_field_index_tail",
-          "option_n_field_index_tail",
+          "option_c_field_index_tail_lower",
+          "option_n_field_index_tail_lower",
 
           // TEE
-          "option_a_flag_tee",
+          "option_a_flag_tee_lower",
 
           // TR
-          "option_d_flag_tr",
-          "option_s_flag_tr",
+          "option_d_flag_tr_lower",
+          "option_s_flag_tr_lower",
 
           // UNIQ
-          "option_c_flag_uniq",
+          "option_c_flag_uniq_lower",
 
           // WC
-          "option_c_flag_wc",
-          "option_l_flag_wc",
-          "option_m_flag_wc",
-          "option_w_flag_wc",
+          "option_c_flag_wc_lower",
+          "option_l_flag_wc_lower",
+          "option_m_flag_wc_lower",
+          "option_w_flag_wc_lower",
 
           // SED
-          "option_i_flag_sed",
-          "option_n_flag_sed",
-          "option_r_flag_sed",
+          "option_i_flag_sed_lower",
+          "option_n_flag_sed_lower",
+          "option_r_flag_sed_lower",
 
           // "option_i_flag",
           // "option_n_flag",
