@@ -155,7 +155,10 @@ function extractChainedBlocksForCode(chainedBlock, isForLibrary = false) {
 
   while (current) {
     if (current.type.startsWith("option_")) {
-      const flag = "-" + current.type.substring(7, 8);
+      let flag = "-" + current.type.substring(7, 8);
+      if (current.type.includes("upper")) {
+        flag = flag.toUpperCase();
+      }
 
       if (
         current.type.includes("field_index") ||

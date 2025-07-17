@@ -375,64 +375,109 @@ function getNoopTypeFromBlockType(blockType) {
 const optionTooltips = {
   cat: {},
   cut: {
-    f: { field_index: "cut : sélectionner des champs spécifiques" },
-    b: { field_index: "cut : sélectionner des octets spécifiques" },
-    c: { field_index: "cut : sélectionner des caractères spécifiques" },
+    f: {
+      field_index: "cut : sélectionner des champs spécifiques",
+      case: "lower",
+    },
+    b: {
+      field_index: "cut : sélectionner des octets spécifiques",
+      case: "lower",
+    },
+    c: {
+      field_index: "cut : sélectionner des caractères spécifiques",
+      case: "lower",
+    },
     d: {
       field_index:
         "cut : définir le délimiteur de champ (par défaut : tabulation)",
+      case: "lower",
     },
   },
   grep: {
-    v: { flag: "grep : afficher les lignes qui ne contiennent pas le motif" },
-    r: { flag: "grep : rechercher récursivement dans les sous-dossiers" },
+    v: {
+      flag: "grep : afficher les lignes qui ne contiennent pas le motif",
+      case: "lower",
+    },
+    r: {
+      flag: "grep : rechercher récursivement dans les sous-dossiers",
+      case: "lower",
+    },
     l: {
       flag: "grep : afficher uniquement les noms des fichiers contenant le motif",
+      case: "lower",
     },
-    i: { flag: "grep : ignorer la casse" },
-    w: { flag: "grep : recherche le motif comme mot entier" },
+    i: { flag: "grep : ignorer la casse", case: "lower" },
+    w: { flag: "grep : recherche le motif comme mot entier", case: "lower" },
     n: {
       flag: "grep : afficher les numéros de ligne pour chaque correspondance",
+      case: "lower",
     },
-    c: { flag: "grep : afficher le nombre de lignes correspondant au motif" },
+    c: {
+      flag: "grep : afficher le nombre de lignes correspondant au motif",
+      case: "lower",
+    },
+    f: {
+      flag: "grep : interprète les motifs comme un string, pas un regex",
+      case: "upper",
+    },
   },
   head: {
     n: {
       field_index: "head : afficher les n premières lignes (par défaut : 10)",
+      case: "lower",
     },
-    c: { field_index: "head : afficher les n premiers octets" },
+    c: { field_index: "head : afficher les n premiers octets", case: "lower" },
   },
   sort: {
-    u: { flag: "sort : supprimer les lignes dupliquées" },
-    n: { flag: "sort : trier par valeur numérique" },
-    r: { flag: "sort : trier dans l’ordre inverse" },
-    k: { field_index: "sort : trier selon une colonne spécifique" },
+    u: { flag: "sort : supprimer les lignes dupliquées", case: "lower" },
+    n: { flag: "sort : trier par valeur numérique", case: "lower" },
+    r: { flag: "sort : trier dans l’ordre inverse", case: "lower" },
+    k: {
+      field_index: "sort : trier selon une colonne spécifique",
+      case: "lower",
+    },
   },
   tail: {
     n: {
       field_index: "tail : afficher les n dernières lignes (par défaut : 10)",
+      case: "lower",
     },
-    c: { field_index: "tail : afficher les n derniers octets" },
+    c: { field_index: "tail : afficher les n derniers octets", case: "lower" },
   },
   tee: {
-    a: { flag: "tee : ajouter au fichier au lieu de l’écraser" },
+    a: { flag: "tee : ajouter au fichier au lieu de l’écraser", case: "lower" },
   },
   tr: {
-    d: { flag: "tr : supprimer les caractères spécifiés" },
-    s: { flag: "tr : remplacer les répétitions consécutives par une seule" },
+    d: { flag: "tr : supprimer les caractères spécifiés", case: "lower" },
+    s: {
+      flag: "tr : remplacer les répétitions consécutives par une seule",
+      case: "lower",
+    },
   },
   uniq: {
-    c: { flag: "uniq : afficher le nombre d’occurrences de chaque ligne" },
+    c: {
+      flag: "uniq : afficher le nombre d’occurrences de chaque ligne",
+      case: "lower",
+    },
   },
   wc: {
-    c: { flag: "wc : compter le nombre de bytes (octets)" },
-    m: { flag: "wc : compter le nombre de caractères" },
-    w: { flag: "wc : compter le nombre de mots" },
-    l: { flag: "wc : compter le nombre de lignes" },
+    c: { flag: "wc : compter le nombre de bytes (octets)", case: "lower" },
+    m: { flag: "wc : compter le nombre de caractères", case: "lower" },
+    w: { flag: "wc : compter le nombre de mots", case: "lower" },
+    l: { flag: "wc : compter le nombre de lignes", case: "lower" },
   },
   sed: {
-    i: { flag: "sed : modifier les fichiers en place (sans redirection)" },
-    n: { flag: "sed : supprimer l'affichage automatique (utiliser avec `p`)" },
-    r: { flag: "sed : activer les expressions régulières étendues (ERE)" },
+    i: {
+      flag: "sed : modifier les fichiers en place (sans redirection)",
+      case: "lower",
+    },
+    n: {
+      flag: "sed : supprimer l'affichage automatique (utiliser avec `p`)",
+      case: "lower",
+    },
+    r: {
+      flag: "sed : activer les expressions régulières étendues (ERE)",
+      case: "lower",
+    },
   },
 };
