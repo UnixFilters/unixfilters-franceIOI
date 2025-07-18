@@ -153,8 +153,15 @@ UnixFilters.onChange = function (context) {
         const block = context.blocklyHelper.workspace.getBlockById(
           event.blockId || event.newValue
         );
-        if (block && block.type.startsWith("option_")) {
-          refreshOptionTooltip(block);
+
+        if (block) {
+          const refreshRecursively = (blk) => {
+            if (blk.type.startsWith("option_")) {
+              refreshOptionTooltip(blk);
+            }
+            blk.getChildren().forEach((child) => refreshRecursively(child));
+          };
+          refreshRecursively(block);
         }
       }
     });
